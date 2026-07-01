@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+
+    <changeSet id="001-1-create-hotel-sequence" author="Vmoskalev">
+        <createSequence
+                sequenceName="hotel_seq"
+                startValue="1"
+                incrementBy="50"
+                minValue="1"
+        />
+
+        <comment>Sequence для генерации ID в таблице hotel</comment>
+    </changeSet>
+
+    <changeSet id="001-2-create-hotel-table" author="Vmoskalev">
+        <createTable tableName="hotel">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(50)"/>
+            <column name="city" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="distance" type="INT"/>
+        </createTable>
+
+        <comment>Создание таблицы hotel</comment>
+    </changeSet>
+
+    <changeSet id="001-3-create-hotel-indexes" author="Vmoskalev">
+        <createIndex indexName="idx_hotel_city" tableName="hotel">
+            <column name="city"/>
+        </createIndex>
+
+        <createIndex indexName="idx_hotel_name" tableName="hotel">
+            <column name="name"/>
+        </createIndex>
+
+        <comment>Индексы для таблицы hotel</comment>
+    </changeSet>
+
+</databaseChangeLog>

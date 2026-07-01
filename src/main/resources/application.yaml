@@ -1,3 +1,44 @@
+server:
+  port: 8090
+
 spring:
   application:
     name: hotel-reservation
+  datasource:
+    url: jdbc:postgresql://localhost:5432/moskalev_dev?currentSchema=hotel_reservation
+    username: vasiliy
+    password: moskalev
+  jpa:
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true   # ANSI-подсветка синтаксиса
+        use_sql_comments: true # Добавляет комментарий с именем репозитория/метода
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+logging:
+  level:
+    # при дебагинге DEBUG /OFF
+    org.hibernate.SQL: DEBUG
+    # при дебагинге TRACE /OFF
+    org.hibernate.orm.jdbc.bind: TRACE
+
+#Сваггер
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+    enabled: true
+
