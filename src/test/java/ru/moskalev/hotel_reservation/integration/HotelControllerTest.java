@@ -1,7 +1,6 @@
 package ru.moskalev.hotel_reservation.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
+import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 import ru.moskalev.hotel_reservation.service.HotelService;
 
 import java.util.List;
@@ -24,8 +24,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.moskalev.hotel_reservation.Constants.HOTEL;
-import static ru.moskalev.hotel_reservation.Constants.V1;
+import static ru.moskalev.hotel_reservation.Constants.*;
 
 @WebMvcTest(HotelController.class)
 class HotelControllerTest {
@@ -150,7 +149,7 @@ class HotelControllerTest {
         );
         when(hotelService.getById(HOTEL_ID_VALUE)).thenReturn(expected);
 
-        mockMvc.perform(get(BASE_URL + "/" + HOTEL_ID_VALUE))
+        mockMvc.perform(get(BASE_URL + PATH + HOTEL_ID_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(HOTEL_ID_VALUE))
                 .andExpect(jsonPath("$.name").value("Hilton"))
@@ -239,7 +238,7 @@ class HotelControllerTest {
         when(hotelService.update(eq(HOTEL_ID_VALUE), any(HotelUpdateInput.class)))
                 .thenReturn(expected);
 
-        mockMvc.perform(put(BASE_URL + "/" + HOTEL_ID_VALUE)
+        mockMvc.perform(put(BASE_URL + PATH + HOTEL_ID_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
                 .andExpect(status().isOk())
@@ -277,7 +276,7 @@ class HotelControllerTest {
         when(hotelService.update(eq(HOTEL_ID_VALUE), any(HotelUpdateInput.class)))
                 .thenReturn(expected);
 
-        mockMvc.perform(put(BASE_URL + "/" + HOTEL_ID_VALUE)
+        mockMvc.perform(put(BASE_URL + PATH + HOTEL_ID_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
                 .andExpect(status().isOk())
@@ -314,7 +313,7 @@ class HotelControllerTest {
                 "Desc", "Title", "City", "Addr", 100
         );
 
-        mockMvc.perform(put(BASE_URL + "/" + HOTEL_ID_VALUE)
+        mockMvc.perform(put(BASE_URL + PATH + HOTEL_ID_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
                 .andExpect(status().isBadRequest())
@@ -326,7 +325,7 @@ class HotelControllerTest {
     void delete_success() throws Exception {
         doNothing().when(hotelService).delete(HOTEL_ID_VALUE);
 
-        mockMvc.perform(delete(BASE_URL + "/" + HOTEL_ID_VALUE))
+        mockMvc.perform(delete(BASE_URL + PATH + HOTEL_ID_VALUE))
                 .andExpect(status().isNoContent());
     }
 

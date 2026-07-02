@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
@@ -14,6 +13,7 @@ import ru.moskalev.hotel_reservation.integration.api.HotelApi;
 import ru.moskalev.hotel_reservation.service.HotelService;
 
 import static ru.moskalev.hotel_reservation.Constants.*;
+import static ru.moskalev.hotel_reservation.utils.CommonUtil.getSort;
 
 @RestController
 @AllArgsConstructor
@@ -33,16 +33,12 @@ public class HotelController implements HotelApi {
     }
 
     @GetMapping
-    public Page<HotelResponse> getAll(@RequestParam(defaultValue = "0") int page,
-                                      @RequestParam(defaultValue = "10") int size,
-                                      @RequestParam(defaultValue = "id") String sortBy,
-                                      @RequestParam(defaultValue = "asc") String direction) {
-        Sort sort = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
-
+    public Page<HotelResponse> getAll(@RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                                      @RequestParam(defaultValue = DEFAULT_SIZE) int size,
+                                      @RequestParam(defaultValue = DEFAULT_SORTED_BY_ID) String sortBy,
+                                      @RequestParam(defaultValue = DEFAULT_DIRECTION_ASC) String direction) {
+        var sort= getSort(sortBy, direction);
         Pageable pageable = PageRequest.of(page, size, sort);
-
         return hotelService.getAll(pageable);
     }
 
