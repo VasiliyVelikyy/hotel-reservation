@@ -1,10 +1,7 @@
 package ru.moskalev.hotel_reservation.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +29,11 @@ public class Hotel {
 
     private Integer distance;
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Grade> grades = new ArrayList<>();
+    private List<Room> rooms=new ArrayList<>();
+
+//    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+//    private List<Grade> grades = new ArrayList<>();
 }

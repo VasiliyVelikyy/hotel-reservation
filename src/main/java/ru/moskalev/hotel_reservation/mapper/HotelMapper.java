@@ -6,9 +6,11 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.moskalev.hotel_reservation.domain.Hotel;
-import ru.moskalev.hotel_reservation.dto.HotelCreateInput;
-import ru.moskalev.hotel_reservation.dto.HotelResponse;
-import ru.moskalev.hotel_reservation.dto.HotelUpdateInput;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface HotelMapper {
@@ -23,4 +25,6 @@ public interface HotelMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "grades", ignore = true)
     Hotel updateEntity(HotelUpdateInput input, @MappingTarget Hotel hotel);
+
+    List<HotelResponse> toOutputDtoList(List<Hotel> hotels);
 }

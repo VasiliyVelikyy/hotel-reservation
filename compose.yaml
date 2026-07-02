@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:latest
+    restart: always
     container_name: postgres_container
     environment:
       POSTGRES_USER: vasiliy

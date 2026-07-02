@@ -1,4 +1,4 @@
-package ru.moskalev.hotel_reservation.dto;
+package ru.moskalev.hotel_reservation.dto.hotel;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;

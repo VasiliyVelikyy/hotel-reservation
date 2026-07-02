@@ -1,13 +1,15 @@
 package ru.moskalev.hotel_reservation.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.moskalev.hotel_reservation.domain.Hotel;
-import ru.moskalev.hotel_reservation.dto.HotelCreateInput;
-import ru.moskalev.hotel_reservation.dto.HotelResponse;
-import ru.moskalev.hotel_reservation.dto.HotelUpdateInput;
-import ru.moskalev.hotel_reservation.exception.HotelException;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
 import ru.moskalev.hotel_reservation.mapper.HotelMapper;
 import ru.moskalev.hotel_reservation.repo.HotelRepository;
 
@@ -33,7 +35,7 @@ public class HotelService {
 
     private Hotel getEntity(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new HotelException(NOT_FOUND_EXCEPTION_TEMPLATE.formatted(id)));
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXCEPTION_TEMPLATE.formatted(id)));
     }
 
     @Transactional
@@ -46,5 +48,11 @@ public class HotelService {
     @Transactional
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HotelResponse> getAll(Pageable pageable) {
+        Page<Hotel> hotelPage = repository.findAll(pageable);
+        return hotelPage.map(mapper::toOutputDto);
     }
 }
