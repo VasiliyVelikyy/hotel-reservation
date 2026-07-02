@@ -5,10 +5,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import ru.moskalev.hotel_reservation.domain.Hotel;
-import ru.moskalev.hotel_reservation.dto.HotelCreateInput;
-import ru.moskalev.hotel_reservation.dto.HotelResponse;
-import ru.moskalev.hotel_reservation.dto.HotelUpdateInput;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
 import ru.moskalev.hotel_reservation.exception.HotelException;
 import ru.moskalev.hotel_reservation.repo.HotelRepository;
 
@@ -77,7 +81,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         assertThat(response.name()).isEqualTo("Simple Hotel");
         assertThat(response.description()).isNull();
         assertThat(response.title()).isNull();
-        assertThat(response.distance()).isNull();
+        assertThat(response.distance()).isZero();
     }
 
     @Test
@@ -191,6 +195,86 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         hotelService.delete(nonExistentId);
     }
 
+    @Test
+    @DisplayName("findAll: должен вернуть страницу с корректными метаданными и ограниченным количеством элементов")
+    void getAll_shouldReturnPageWithCorrectMetadata() {
+        // given
+        hotelRepository.save(buildHotel("Hotel 1"));
+        hotelRepository.save(buildHotel("Hotel 2"));
+        hotelRepository.save(buildHotel("Hotel 3"));
+
+        Pageable pageable = PageRequest.of(0, 2);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAll(pageable);
+
+        // then
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getTotalElements()).isEqualTo(3);
+        assertThat(result.getTotalPages()).isEqualTo(2);
+        assertThat(result.isFirst()).isTrue();
+    }
+
+    @Test
+    @DisplayName("findAll: должен корректно применять сортировку по названию")
+    void getAll_shouldApplySorting() {
+        // given
+        String zHotel = "Z Hotel";
+        String aHotel = "A Hotel";
+        String mHotel = "M Hotel";
+        hotelRepository.save(buildHotel(zHotel));
+
+        hotelRepository.save(buildHotel(aHotel));
+
+        hotelRepository.save(buildHotel(mHotel));
+
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("name").ascending());
+
+        // when
+        Page<HotelResponse> result = hotelService.getAll(pageable);
+
+        // then
+        assertThat(result.getContent())
+                .extracting(HotelResponse::name)
+                .containsExactly(aHotel, mHotel, zHotel);
+    }
+
+    @Test
+    @DisplayName("findAll: должен вернуть пустой список, если запрашиваемая страница за пределами")
+    void getAll_shouldReturnEmptyContentWhenPageOutOfBounds() {
+        // given
+        hotelRepository.save(buildHotel("Hotel 1"));
+
+        Pageable pageable = PageRequest.of(5, 10);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAll(pageable);
+
+        // then
+        assertThat(result.getContent()).isEmpty();
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getNumber()).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("findAll: должен корректно вернуть вторую страницу")
+    void getAll_shouldReturnSecondPage() {
+        // given
+        hotelRepository.save(buildHotel("Hotel A"));
+        hotelRepository.save(buildHotel("Hotel B"));
+        hotelRepository.save(buildHotel("Hotel C"));
+        hotelRepository.save(buildHotel("Hotel D"));
+
+        Pageable pageable = PageRequest.of(1, 2);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAll(pageable);
+
+        // then
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.isFirst()).isFalse();
+        assertThat(result.isLast()).isTrue();
+    }
 
     private Hotel buildHotel(String name) {
         Hotel hotel = new Hotel();

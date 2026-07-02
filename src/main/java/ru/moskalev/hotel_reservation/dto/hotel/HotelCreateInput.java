@@ -1,27 +1,40 @@
-package ru.moskalev.hotel_reservation.dto;
+package ru.moskalev.hotel_reservation.dto.hotel;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
-public record HotelResponse(
-        @Schema(description = "Идентификатор отеля", example = "1")
-        Long id,
+@Schema(description = "Входные данные для создания отеля")
+public record HotelCreateInput(
+
         @Schema(description = "Название отеля", example = "Grand Hotel")
+        @NotBlank
+        @Size(max = 50)
         String name,
 
         @Schema(description = "Описание отеля", nullable = true)
-
+        @Size(max = 255)
         String description,
 
         @Schema(description = "Заголовок", nullable = true)
+        @Size(max = 50)
         String title,
 
         @Schema(description = "Город")
+        @Size(max = 50)
+        @NotBlank
         String city,
 
         @Schema(description = "Город")
+        @Size(max = 100)
+        @NotBlank
         String address,
 
         @Schema(description = "Расстояние в метрах", example = "1500")
+        @NotNull
+        @Positive
         Integer distance
 ) {
 }
