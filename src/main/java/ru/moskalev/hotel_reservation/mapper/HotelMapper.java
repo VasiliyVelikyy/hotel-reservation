@@ -16,14 +16,14 @@ import java.util.List;
 public interface HotelMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "grades", ignore = true)
+    //@Mapping(target = "grades", ignore = true)
     Hotel toEntity(HotelCreateInput input);
 
     HotelResponse toOutputDto(Hotel hotel);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "grades", ignore = true)
+   // @Mapping(target = "grades", ignore = true)
     Hotel updateEntity(HotelUpdateInput input, @MappingTarget Hotel hotel);
 
     List<HotelResponse> toOutputDtoList(List<Hotel> hotels);

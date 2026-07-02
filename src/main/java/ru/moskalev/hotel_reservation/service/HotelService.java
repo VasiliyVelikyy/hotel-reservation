@@ -1,6 +1,5 @@
 package ru.moskalev.hotel_reservation.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,10 +9,11 @@ import ru.moskalev.hotel_reservation.domain.Hotel;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
+import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 import ru.moskalev.hotel_reservation.mapper.HotelMapper;
 import ru.moskalev.hotel_reservation.repo.HotelRepository;
 
-import static ru.moskalev.hotel_reservation.exception.HotelException.NOT_FOUND_EXCEPTION_TEMPLATE;
+import static ru.moskalev.hotel_reservation.exception.ErrorMessagesTemplates.HOTEL_NOT_FOUND_TEMPLATE;
 
 @Service
 @AllArgsConstructor
@@ -29,18 +29,26 @@ public class HotelService {
 
     @Transactional(readOnly = true)
     public HotelResponse getById(Long id) {
-        var entity = getEntity(id);
+        var entity = getHotel(id);
         return mapper.toOutputDto(entity);
     }
 
-    private Hotel getEntity(Long id) {
+    @Transactional(readOnly = true)
+    public Hotel getHotel(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXCEPTION_TEMPLATE.formatted(id)));
+                .orElseThrow(() -> new EntityNotFoundException(HOTEL_NOT_FOUND_TEMPLATE.formatted(id)));
+    }
+
+    @Transactional(readOnly = true)
+    public void checkExistHotel(Long id) {
+        if(!repository.existsById(id)){
+            throw new  EntityNotFoundException(HOTEL_NOT_FOUND_TEMPLATE.formatted(id));
+        }
     }
 
     @Transactional
     public HotelResponse update(Long id, HotelUpdateInput input) {
-        Hotel hotel = getEntity(id);
+        Hotel hotel = getHotel(id);
         var updateEntity = mapper.updateEntity(input, hotel);
         return mapper.toOutputDto(repository.save(updateEntity));
     }

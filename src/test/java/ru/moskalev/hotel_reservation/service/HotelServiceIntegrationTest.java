@@ -13,7 +13,7 @@ import ru.moskalev.hotel_reservation.domain.Hotel;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
-import ru.moskalev.hotel_reservation.exception.HotelException;
+import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 import ru.moskalev.hotel_reservation.repo.HotelRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,7 +70,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
                 null,
                 null,
                 "SPB",
-                null,
+                "ul Pushkina",
                 0
         );
 
@@ -106,7 +106,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
 
         // when & then
         assertThatThrownBy(() -> hotelService.getById(nonExistentId))
-                .isInstanceOf(HotelException.class)
+                .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining(nonExistentId.toString());
     }
 
@@ -166,7 +166,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
 
         // when & then
         assertThatThrownBy(() -> hotelService.update(99999L, input))
-                .isInstanceOf(HotelException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
@@ -282,6 +282,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         hotel.setDescription("Description");
         hotel.setTitle("Title");
         hotel.setCity("City");
+        hotel.setAddress("Ul Pushkina");
         hotel.setDistance(100);
         return hotel;
     }
