@@ -15,6 +15,8 @@ import ru.moskalev.hotel_reservation.service.HotelService;
 import static ru.moskalev.hotel_reservation.Constants.*;
 import static ru.moskalev.hotel_reservation.utils.CommonUtil.getSort;
 
+//todo http file, logging
+
 @RestController
 @AllArgsConstructor
 @RequestMapping(V1 + HOTEL)
