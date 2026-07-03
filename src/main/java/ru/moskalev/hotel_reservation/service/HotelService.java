@@ -63,4 +63,5 @@ public class HotelService {
         Page<Hotel> hotelPage = repository.findAll(pageable);
         return hotelPage.map(mapper::toOutputDto);
     }
+
 }

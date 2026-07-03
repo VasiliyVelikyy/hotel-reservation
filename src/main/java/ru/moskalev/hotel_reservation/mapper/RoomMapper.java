@@ -16,9 +16,9 @@ import java.util.List;
 public interface RoomMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "hotel", source = "hotel")
-    @Mapping(target = "hotel.id", source = "hotel")
-    Room toEntity(RoomCreateInput input, Long hotel);
+    @Mapping(target = "hotel.id", source = "hotelId")
+    @Mapping(target = "hotelId", ignore = true)
+    Room toEntity(RoomCreateInput input, Long hotelId);
 
     @Mapping(target = "hotelId", source = "hotel.id")
     RoomResponse toOutputDto(Room room);
