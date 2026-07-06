@@ -17,7 +17,7 @@ import static ru.moskalev.hotel_reservation.Constants.*;
 public class UserController implements UserApi {
     private final UserService userService;
 
-    @GetMapping(LOGIN)
+    @GetMapping(LOGIN + LOGIN_PATH)
     public UserResponse getUserByLogin(@PathVariable String login) {
         return userService.getUserByLogin(login);
     }

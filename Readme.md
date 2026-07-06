@@ -10,3 +10,6 @@ docker compose up -d
 ```sql
 CREATE SCHEMA IF NOT EXISTS hotel_reservation
 ```
+
+# Сваггер
+> <http://localhost:8090/swagger-ui>
