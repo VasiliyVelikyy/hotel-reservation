@@ -5,27 +5,27 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="002-1-create-user-sequence" author="Vmoskalev">
+    <changeSet id="004-1-create-users-sequence" author="Vmoskalev">
         <createSequence
-                sequenceName="user_seq"
+                sequenceName="users_seq"
                 startValue="1"
                 incrementBy="50"
                 minValue="1"
         />
 
-        <comment>Sequence для генерации ID в таблице user</comment>
+        <comment>Sequence для генерации ID в таблице users</comment>
     </changeSet>
 
-    <changeSet id="002-2-create-user-table" author="Vmoskalev">
-        <createTable tableName="user">
+    <changeSet id="004-2-create-users-table" author="Vmoskalev">
+        <createTable tableName="users">
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="login" type="VARCHAR(50)">
-                <constraints nullable="false" unique="true" uniqueConstraintName="uk_user_login"/>
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_users_login"/>
             </column>
             <column name="email" type="VARCHAR(100)">
-                <constraints nullable="false" unique="true" uniqueConstraintName="uk_user_email"/>
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_users_email"/>
             </column>
             <column name="hash_password" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -35,14 +35,14 @@
             </column>
         </createTable>
 
-        <comment>Создание таблицы user</comment>
+        <comment>Создание таблицы users</comment>
     </changeSet>
 
-    <changeSet id="002-3-create-user-indexes" author="Vmoskalev">
-        <createIndex indexName="idx_user_role" tableName="user">
+    <changeSet id="004-3-create-users-indexes" author="Vmoskalev">
+        <createIndex indexName="idx_users_role" tableName="users">
             <column name="role"/>
         </createIndex>
 
-        <comment>Индексы для таблицы user</comment>
+        <comment>Индексы для таблицы users</comment>
     </changeSet>
 </databaseChangeLog>

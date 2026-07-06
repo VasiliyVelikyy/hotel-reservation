@@ -10,7 +10,8 @@ public class Constants {
     public static final String HOTEL_ID = "/{hotelId}";
     public static final String ROOM_ID = "/{roomId}";
     public static final String USER_ID = "/{userId}";
-    public static final String LOGIN = "/{login}";
+    public static final String LOGIN = "/login";
+    public static final String LOGIN_PATH = "/{login}";
 
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_SIZE = "10";
