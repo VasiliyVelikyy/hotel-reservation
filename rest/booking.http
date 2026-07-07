@@ -1,0 +1,183 @@
+### Переменные окружения
+@host = http://localhost:8090
+@baseUrl = {{host}}/v1/booking
+
+### Переменные для тестов
+@adminLogin = testLogin
+@adminPass = qwertyui
+@clientLogin = clientTestLogin
+@clientPass = qwertyui
+
+### 0. Подготовка тестовых данных (создание отеля и комнаты)
+### Создание отеля
+POST {{host}}/v1/hotel
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "name": "Test Hotel for Bookings",
+  "description": "Hotel created for booking testing",
+  "title": "Test Hotel",
+  "city": "Moscow",
+  "address": "Test street, 1",
+  "distance": 100
+}
+
+> {%
+    client.global.set("hotelId", response.body.id);
+    client.log("Создан отель с ID: " + response.body.id);
+%}
+
+### Создание комнаты
+POST {{host}}/v1/room/{{hotelId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "name": "Test Room",
+  "description": "Room for testing",
+  "number": 101,
+  "price": 5000.00,
+  "maxCount": 2,
+  "freeStartDate": 1700000000000,
+  "freeEndDate": 1800000000000
+}
+
+> {%
+    client.global.set("roomId", response.body.id);
+    client.log("Создана комната с ID: " + response.body.id);
+%}
+
+### 1. Создание бронирования (POST)
+POST {{baseUrl}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "roomId": {{roomId}},
+  "startDate": "2026-08-10",
+  "endDate": "2026-08-15",
+  "guestCount": 2
+}
+
+> {%
+    // Автоматически сохраняем ID созданного бронирования
+    client.global.set("bookingId", response.body.id);
+    client.log("Бронирование успешно создано. Присвоен ID: " + response.body.id);
+
+    // Проверка статуса
+    client.test("Создание бронирования прошло успешно", function() {
+        client.assert(response.status === 200 || response.status === 201, "Ожидался статус 200/201, получен " + response.status);
+    });
+%}
+
+### 2. Получение бронирования по ID (GET)
+GET {{baseUrl}}/{{bookingId}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 3. Получение чужих бронирований (GET) (401)
+GET {{baseUrl}}/my
+Accept: application/json
+Authorization: Basic {{clientLogin}} {{clientPass}}
+
+### 3.1 Получение моих бронирований (GET)
+GET {{baseUrl}}/my
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 4. Отмена бронирования (DELETE)
+DELETE {{baseUrl}}/{{bookingId}}
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 5. Проверка, что бронирование действительно отменено (ожидается 404)
+GET {{baseUrl}}/{{bookingId}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 6. Негативные сценарии (для проверки валидации)
+
+### Ошибка: дата заезда >= даты выезда (400 Bad Request)
+POST {{baseUrl}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "roomId": {{roomId}},
+  "startDate": "2026-08-15",
+  "endDate": "2026-08-10",
+  "guestCount": 2
+}
+
+### Ошибка: количество гостей = 0 (400 Bad Request)
+POST {{baseUrl}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "roomId": {{roomId}},
+  "startDate": "2026-08-10",
+  "endDate": "2026-08-15",
+  "guestCount": 0
+}
+
+### Ошибка: комната не существует (404 Not Found)
+POST {{baseUrl}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "roomId": 99999,
+  "startDate": "2026-08-10",
+  "endDate": "2026-08-15",
+  "guestCount": 2
+}
+
+### Ошибка: бронирование на уже занятые даты (400/409 Conflict)
+### Сначала создаем бронирование
+POST {{baseUrl}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "roomId": {{roomId}},
+  "startDate": "2026-09-01",
+  "endDate": "2026-09-10",
+  "guestCount": 1
+}
+
+> {%
+    client.global.set("existingBookingId", response.body.id);
+%}
+
+### Теперь пытаемся забронировать пересекающиеся даты
+POST {{baseUrl}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "roomId": {{roomId}},
+  "startDate": "2026-09-05",
+  "endDate": "2026-09-08",
+  "guestCount": 1
+}
+
+### Ошибка: попытка отменить чужое бронирование (403 Forbidden)
+DELETE {{baseUrl}}/{{existingBookingId}}
+Authorization: Basic {{clientLogin}} {{clientPass}}
+
+### Ошибка: запрос без авторизации (401 Unauthorized)
+GET {{baseUrl}}/my
+
+### НЕГАТИВНЫЙ СЦЕНАРИЙ: Клиент пытается получить все бронирования (401 Forbidden)
+GET {{baseUrl}}
+Accept: application/json
+Authorization: Basic {{clientLogin}} {{clientPass}}

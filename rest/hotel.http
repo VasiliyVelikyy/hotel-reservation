@@ -1,0 +1,73 @@
+### Переменные окружения
+@host = http://localhost:8090
+@baseUrl = {{host}}/v1/hotel
+
+### Переменные для тестов
+@adminLogin = testLogin
+@adminPass = qwertyui
+@clientLogin = clientTestLogin
+@clientPass = qwertyui
+
+### 1. Создание отеля (POST)
+POST {{baseUrl}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "name": "Grand Hotel",
+  "description": "Luxury hotel in the city center with a great view",
+  "title": "The Grand Experience",
+  "city": "Moscow",
+  "address": "Tverskaya street, 1",
+  "distance": 1500
+}
+
+> {%
+    // Автоматически сохраняем ID созданного отеля в глобальную переменную
+    client.global.set("hotelId", response.body.id);
+    client.log("Отель успешно создан. Присвоен ID: " + response.body.id);
+
+    // Опциональная проверка статуса
+    client.test("Создание отеля прошло успешно", function() {
+        client.assert(response.status === 201, "Ожидался статус 201, получен " + response.status);
+    });
+%}
+
+
+### 2. Получение всех отелей с пагинацией и сортировкой (GET)
+GET {{baseUrl}}?page=0&size=10&sortBy=id&direction=asc
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 3. Получение отеля по ID (GET)
+### ======================================================================
+# Переменная {{hotelId}} подставится автоматически из шага 1,
+# либо вы можете заменить её на конкретное число (например, 1)
+GET {{baseUrl}}/{{hotelId}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 4. Обновление отеля (PUT)
+PUT {{baseUrl}}/{{hotelId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "name": "Updated Grand Hotel",
+  "description": "New description after renovation",
+  "title": "Premium Grand Experience",
+  "city": "Saint Petersburg",
+  "address": "Nevsky prospect, 28",
+  "distance": 2500
+}
+
+### 5. Удаление отеля (DELETE)
+DELETE {{baseUrl}}/{{hotelId}}
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 6. Проверка, что отель действительно удален (404)
+GET {{baseUrl}}/{{hotelId}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}

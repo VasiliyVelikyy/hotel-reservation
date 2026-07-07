@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex) {
-        log.error(ex.getMessage(),ex);
+        log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
             EntityAlreadyExistsException.class,
             BookingException.class
     })
-    public ResponseEntity<ErrorResponse> handleEntityAlreadyExists(EntityAlreadyExistsException ex) {
+    public ResponseEntity<ErrorResponse> handleEntityAlreadyExists(RuntimeException ex) {
         log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
-        log.error(ex.getMessage(),ex);
+        log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(ValidationException ex) {
-        log.error(ex.getMessage(),ex);
+        log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     //Validation  exception
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        log.error(ex.getMessage(),ex);
+        log.error(ex.getMessage(), ex);
         String errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -87,10 +87,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
-        log.error(ex.getMessage(),ex);
+        log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
+                "Internal Server Error" + ex.getMessage(),
                 "An unexpected error occurred. Please try again later."
         );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
