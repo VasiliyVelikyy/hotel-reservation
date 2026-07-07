@@ -13,6 +13,8 @@ import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 import ru.moskalev.hotel_reservation.mapper.RoomMapper;
 import ru.moskalev.hotel_reservation.repo.RoomRepository;
 
+import java.util.Optional;
+
 import static ru.moskalev.hotel_reservation.exception.ErrorMessagesTemplates.ROOM_NOT_FOUND_TEMPLATE;
 
 @Service
@@ -50,15 +52,20 @@ public class RoomService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException(ROOM_NOT_FOUND_TEMPLATE.formatted(id));
+    public void delete(Long roomId) {
+        if (!repository.existsById(roomId)) {
+            throw new EntityNotFoundException(ROOM_NOT_FOUND_TEMPLATE.formatted(roomId));
         }
-        repository.deleteById(id);
+        repository.deleteById(roomId);
     }
 
-    private Room getRoom(Long id) {
+    public Room getRoom(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ROOM_NOT_FOUND_TEMPLATE.formatted(id)));
+    }
+
+    public Room findByIdForUpdate(Long roomId) {
+       return repository.findByIdForUpdate(roomId)
+                .orElseThrow(() -> new EntityNotFoundException(ROOM_NOT_FOUND_TEMPLATE.formatted(roomId)));
     }
 }

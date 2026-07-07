@@ -39,7 +39,7 @@ public class HotelController implements HotelApi {
                                       @RequestParam(defaultValue = DEFAULT_SIZE) int size,
                                       @RequestParam(defaultValue = DEFAULT_SORTED_BY_ID) String sortBy,
                                       @RequestParam(defaultValue = DEFAULT_DIRECTION_ASC) String direction) {
-        var sort= getSort(sortBy, direction);
+        var sort = getSort(sortBy, direction);
         Pageable pageable = PageRequest.of(page, size, sort);
         return hotelService.getAll(pageable);
     }

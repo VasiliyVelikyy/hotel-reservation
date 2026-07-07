@@ -74,8 +74,6 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         assertThat(response.number()).isEqualTo((short) 101);
         assertThat(response.price()).isEqualByComparingTo(new BigDecimal("5000.00"));
         assertThat(response.maxCount()).isEqualTo((byte) 2);
-        assertThat(response.freeStartDate()).isEqualTo(1700000000L);
-        assertThat(response.freeEndDate()).isEqualTo(1700100000L);
         assertThat(response.hotelId()).isEqualTo(hotelId);
 
         assertThat(roomRepository.findById(response.id())).isPresent();
@@ -359,8 +357,6 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         room.setNumber((short) 100);
         room.setPrice(new BigDecimal("1000.00"));
         room.setMaxCount((byte) 2);
-        room.setFreeStartDate(1700000000L);
-        room.setFreeEndDate(1700100000L);
 
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new EntityNotFoundException("Hotel not found"));

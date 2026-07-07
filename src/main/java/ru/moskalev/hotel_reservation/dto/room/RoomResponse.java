@@ -25,12 +25,6 @@ public record RoomResponse(
         @Schema(description = "Максимальное количество гостей", example = "2")
         Byte maxCount,
 
-        @Schema(description = "Дата начала свободного периода (в миллисекундах)", example = "1700000000000")
-        Long freeStartDate,
-
-        @Schema(description = "Дата окончания свободного периода (в миллисекундах)", example = "1700100000000")
-        Long freeEndDate,
-
         @Schema(description = "Идентификатор отеля", example = "1")
         Long hotelId
 ) {

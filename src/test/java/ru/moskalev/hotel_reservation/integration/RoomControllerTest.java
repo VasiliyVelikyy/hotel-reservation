@@ -66,8 +66,6 @@ class RoomControllerTest {
                 (short) 101,
                 new BigDecimal("5000.00"),
                 (byte) 2,
-                1700000000L,
-                1700100000L,
                 HOTEL_ID_VALUE
         );
 
@@ -83,8 +81,6 @@ class RoomControllerTest {
                 .andExpect(jsonPath("$.number").value(101))
                 .andExpect(jsonPath("$.price").value(5000.00))
                 .andExpect(jsonPath("$.maxCount").value(2))
-                .andExpect(jsonPath("$.freeStartDate").value(1700000000L))
-                .andExpect(jsonPath("$.freeEndDate").value(1700100000L))
                 .andExpect(jsonPath("$.hotelId").value(HOTEL_ID_VALUE));
     }
 
@@ -160,8 +156,6 @@ class RoomControllerTest {
                 (short) 101,
                 new BigDecimal("5000.00"),
                 (byte) 2,
-                1700000000L,
-                1700100000L,
                 HOTEL_ID_VALUE
         );
 
@@ -191,12 +185,20 @@ class RoomControllerTest {
     @DisplayName("GET /{hotelId} — 200 — список номеров успешно получен")
     void getAllByHotelId_success() throws Exception {
         List<RoomResponse> content = List.of(
-                new RoomResponse(1L, "Люкс", "Desc 1", (short) 101,
-                        new BigDecimal("5000.00"), (byte) 2,
-                        1700000000L, 1700100000L, HOTEL_ID_VALUE),
-                new RoomResponse(2L, "Стандарт", "Desc 2", (short) 102,
-                        new BigDecimal("3000.00"), (byte) 1,
-                        1700000000L, 1700100000L, HOTEL_ID_VALUE)
+                new RoomResponse(1L,
+                        "Люкс",
+                        "Desc 1",
+                        (short) 101,
+                        new BigDecimal("5000.00"),
+                        (byte) 2,
+                        HOTEL_ID_VALUE),
+                new RoomResponse(2L,
+                        "Стандарт",
+                        "Desc 2",
+                        (short) 102,
+                        new BigDecimal("3000.00"),
+                        (byte) 1,
+                        HOTEL_ID_VALUE)
         );
         Page<RoomResponse> page = new PageImpl<>(content);
 
@@ -269,8 +271,6 @@ class RoomControllerTest {
                 (short) 202,
                 new BigDecimal("6000.00"),
                 (byte) 3,
-                1700200000000L,
-                1700300000000L,
                 HOTEL_ID_VALUE
         );
 
@@ -303,8 +303,6 @@ class RoomControllerTest {
                 (short) 101,
                 new BigDecimal("5000.00"),
                 (byte) 2,
-                1700000000L,
-                1700100000L,
                 HOTEL_ID_VALUE
         );
 

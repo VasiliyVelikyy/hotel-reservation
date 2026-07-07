@@ -1,12 +1,11 @@
 package ru.moskalev.hotel_reservation.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,14 +29,17 @@ public class Room {
 
     private byte maxCount;
 
-    private long freeStartDate;
-
-    private long freeEndDate;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = HOTEL_ID, nullable = false)
     private Hotel hotel;
 
     @Column(name = HOTEL_ID, insertable = false, updatable = false)
     private Long hotelId;
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
+    private List<Booking> bookings = new ArrayList<>();
 }
+
+
