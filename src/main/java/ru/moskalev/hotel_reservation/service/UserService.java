@@ -26,9 +26,13 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponse getUserByLogin(String login) {
-        var user = repository.findUserByLogin(login)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_TEMPLATE.formatted("login", login)));
+        var user = findUserByLogin(login);
         return mapper.toOutputDto(user);
+    }
+
+    protected User findUserByLogin(String login) {
+        return repository.findUserByLogin(login)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_TEMPLATE.formatted("login", login)));
     }
 
     @Transactional(readOnly = true)
@@ -101,4 +105,7 @@ public class UserService {
     }
 
 
+    public User getReferenceById(Long userId) {
+    return repository.getReferenceById(userId);
+    }
 }

@@ -34,8 +34,8 @@
             <column name="max_count" type="SMALLINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="free_start_date" type="BIGINT"/>
-            <column name="free_end_date" type="BIGINT"/>
+            <column name="unavailable_start_date" type="BIGINT"/>
+            <column name="unavailable_end_date" type="BIGINT"/>
             <column name="hotel_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>

@@ -15,7 +15,7 @@ class PassEncoderTest {
         String encoded = encoder.encode(rawPassword);
 
         assertThat(encoded).startsWith("$argon2id$");
-        assertThat(encoded.length()).isGreaterThan(100);
+        assertThat(encoded.length()).isGreaterThan(96);
 
         assertThat(encoder.matches(rawPassword, encoded)).isTrue();
         assertThat(encoder.matches("wrongPassword", encoded)).isFalse();

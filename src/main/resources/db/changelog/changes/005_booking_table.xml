@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+
+    <changeSet id="005-1-create-booking-sequence" author="Vmoskalev">
+        <createSequence
+                sequenceName="booking_seq"
+                startValue="1"
+                incrementBy="50"
+                minValue="1"
+        />
+        <comment>Sequence для генерации ID в таблице booking</comment>
+    </changeSet>
+
+    <changeSet id="005-2-create-booking-table" author="Vmoskalev">
+        <createTable tableName="booking">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="start_date" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="guest_count" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_booking_user"
+                             referencedTableName="users"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="room_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_booking_room"
+                             referencedTableName="room"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+        <comment>Создание таблицы booking</comment>
+    </changeSet>
+
+    <changeSet id="005-3-create-booking-indexes" author="Vmoskalev">
+        <createIndex indexName="idx_booking_user_id" tableName="booking">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_booking_room_id" tableName="booking">
+            <column name="room_id"/>
+        </createIndex>
+
+        <comment>Индексы для таблицы booking</comment>
+    </changeSet>
+
+
+</databaseChangeLog>

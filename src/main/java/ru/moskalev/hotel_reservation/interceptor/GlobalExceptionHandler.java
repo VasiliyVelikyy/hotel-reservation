@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import ru.moskalev.hotel_reservation.dto.ErrorResponse;
+import ru.moskalev.hotel_reservation.exception.BookingException;
 import ru.moskalev.hotel_reservation.exception.EntityAlreadyExistsException;
 import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 
@@ -30,9 +31,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(EntityAlreadyExistsException.class)
+    @ExceptionHandler({
+            EntityAlreadyExistsException.class,
+            BookingException.class
+    })
     public ResponseEntity<ErrorResponse> handleEntityAlreadyExists(EntityAlreadyExistsException ex) {
-        log.error(ex.getMessage(),ex);
+        log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
@@ -40,6 +44,7 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
         log.error(ex.getMessage(),ex);
