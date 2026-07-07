@@ -13,7 +13,7 @@ import static ru.moskalev.hotel_reservation.exception.ErrorMessagesTemplates.NOT
 
 public class CommonUtil {
     public static Sort getSort(String sortBy, String direction) {
-        return switch (direction.toLowerCase()) {
+        return switch (direction.toUpperCase()) {
             case DEFAULT_DIRECTION_ASC -> Sort.by(sortBy).ascending();
             case DIRECTION_DESC -> Sort.by(sortBy).descending();
             default -> throw new PaginatedException(NOT_VALID_SORTED_TEMPLATE);

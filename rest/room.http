@@ -1,0 +1,93 @@
+### Переменные окружения
+@host = http://localhost:8090
+@baseUrl = {{host}}/v1/room
+
+### Переменные для тестов
+@adminLogin = testLogin
+@adminPass = qwertyui
+@clientLogin = clientTestLogin
+@clientPass = qwertyui
+
+### 0. (Подготовка) Создание отеля для получения валидного hotelId
+
+
+POST {{host}}/v1/hotel
+Content-Type: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "name": "Test Hotel for Rooms",
+  "description": "Hotel created for room testing",
+  "city": "Moscow",
+  "address": "Test street, 1",
+  "distance": 100
+}
+
+> {%
+    // Сохраняем ID созданного отеля
+    client.global.set("hotelId", response.body.id);
+    client.log("Создан отель с ID: " + response.body.id);
+%}
+
+### 1. Создание номера (POST)
+POST {{baseUrl}}/{{hotelId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "name": "Президентский Люкс",
+  "description": "Огромный номер с панорамным видом на город",
+  "number": 101,
+  "price": 25000.50,
+  "maxCount": 2,
+  "freeStartDate": 1700000000000,
+  "freeEndDate": 1700100000000
+}
+
+> {%
+    // Сохраняем ID созданного номера для следующих запросов
+    client.global.set("roomId", response.body.id);
+    client.log("Номер успешно создан. Присвоен ID: " + response.body.id);
+
+    client.test("Создание номера прошло успешно", function() {
+        client.assert(response.status === 201, "Ожидался статус 201, получен " + response.status);
+    });
+%}
+
+### 2. Получение номера по ID (GET)
+GET {{baseUrl}}/{{roomId}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 3. Получение всех номеров конкретного отеля с пагинацией (GET)
+### Путь: /v1/rooms/hotel/{hotelId}
+
+GET {{baseUrl}}/hotel/{{hotelId}}?page=0&size=10&sortBy=price&direction=desc
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 4. Обновление номера (PUT)
+PUT {{baseUrl}}/{{roomId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "name": "Обновленный Люкс",
+  "description": "Обновленное описание после ремонта",
+  "number": 102,
+  "price": 30000.00,
+  "maxCount": 3,
+  "freeStartDate": 1700200000000,
+  "freeEndDate": 1700300000000
+}
+
+### 5. Удаление номера (DELETE)
+DELETE {{baseUrl}}/{{roomId}}
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 6. Проверка, что номер действительно удален (ожидается 404 Not Found)
+GET {{baseUrl}}/{{roomId}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}

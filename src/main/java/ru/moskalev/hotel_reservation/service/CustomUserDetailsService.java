@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.moskalev.hotel_reservation.domain.CustomUserDetails;
 import ru.moskalev.hotel_reservation.domain.User;
-import ru.moskalev.hotel_reservation.repo.UserRepository;
 
 import java.util.Collections;
 
@@ -25,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getId(),
                 user.getLogin(),
                 user.getHashPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()))
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
     }
 }

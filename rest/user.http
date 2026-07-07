@@ -1,0 +1,73 @@
+### Базовые переменные
+@host = http://localhost:8090
+@baseUrl = {{host}}/v1/user
+
+### Переменные для тестов
+@adminLogin = testLogin
+@adminPass = qwertyui
+@clientLogin = clientTestLogin
+@clientPass = qwertyui
+
+### 1. Создание пользователя (POST)
+POST {{baseUrl}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "login": "testLogin",
+  "email": "test@mail.dev",
+  "password": "qwertyui",
+  "role": "ADMIN"
+}
+
+> {%
+    // Сохраняем ID и логин созданного пользователя для следующих запросов
+    client.global.set("userId", response.body.id);
+    client.global.set("userLogin", response.body.login);
+    client.log("Пользователь успешно создан. ID: " + response.body.id + ", Login: " + response.body.login);
+
+    // Проверка статуса
+    client.test("Создание пользователя прошло успешно", function() {
+        client.assert(response.status === 200 || response.status === 201, "Ожидался статус 200/201, получен " + response.status);
+    });
+%}
+
+### 2. Получение пользователя по ID (GET)
+GET {{baseUrl}}/{{userId}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 3. Получение пользователя по логину (GET)
+GET {{baseUrl}}/login/{{userLogin}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 4. Частичное обновление пользователя (PUT)
+###  меняем только email и роль
+PUT {{baseUrl}}/{{userId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "email": "new_email@mail.dev"
+}
+
+### 5. Смена пароля (PUT)
+PUT {{baseUrl}}/{{userId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "password": "qwertyui"
+}
+
+### 6. Удаление пользователя (DELETE)
+DELETE {{baseUrl}}/{{userId}}
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 7. Проверка, что пользователь удален (ожидается 404 Not Found)
+GET {{baseUrl}}/{{userId}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
