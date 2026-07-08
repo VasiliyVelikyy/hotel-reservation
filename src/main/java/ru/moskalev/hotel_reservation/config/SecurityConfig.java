@@ -12,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import static ru.moskalev.hotel_reservation.Constants.*;
-import static ru.moskalev.hotel_reservation.enumeration.UserRole.ADMIN;
 
 @Configuration
 public class SecurityConfig {
@@ -25,6 +24,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http.authorizeHttpRequests(auth -> auth
+                        //сваггер
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui",
@@ -33,20 +33,8 @@ public class SecurityConfig {
                                 "/favicon.ico",
                                 "/error"
                         ).permitAll()
+                        // Регистрация без авторизации
                         .requestMatchers(HttpMethod.POST, V1 + USER).permitAll()
-
-                        .requestMatchers(HttpMethod.POST, V1 + HOTEL).hasRole(ADMIN.name())
-                        .requestMatchers(HttpMethod.PUT, V1 + HOTEL + OTHER_PATH).hasRole(ADMIN.name())
-                        .requestMatchers(HttpMethod.DELETE, V1 + HOTEL + OTHER_PATH).hasRole(ADMIN.name())
-
-                        .requestMatchers(HttpMethod.POST, V1 + ROOM + OTHER_PATH).hasRole(ADMIN.name())
-                        .requestMatchers(HttpMethod.PUT, V1 + ROOM + OTHER_PATH).hasRole(ADMIN.name())
-                        .requestMatchers(HttpMethod.DELETE, V1 + ROOM + OTHER_PATH).hasRole(ADMIN.name())
-
-                        //  Получение списка всех броней — только ADMIN
-                        // (Предполагаем, что GET /bookings - это список всех, а /bookings/my - свои)
-                        .requestMatchers(HttpMethod.GET, V1 + BOOKING).hasRole(ADMIN.name())
-
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)

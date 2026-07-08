@@ -181,3 +181,8 @@ GET {{baseUrl}}/my
 GET {{baseUrl}}
 Accept: application/json
 Authorization: Basic {{clientLogin}} {{clientPass}}
+
+### Админ пытается получить все бронирования (Успех)
+GET {{baseUrl}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}

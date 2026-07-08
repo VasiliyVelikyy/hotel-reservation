@@ -21,7 +21,7 @@ public interface RoomMapper {
     Room toEntity(RoomCreateInput input, Long hotelId);
 
     @Mapping(target = "hotelId", source = "hotel.id")
-    RoomResponse toOutputDto(Room room);
+    RoomResponse toResponse(Room room);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
