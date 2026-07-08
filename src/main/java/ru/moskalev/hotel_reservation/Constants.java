@@ -19,7 +19,7 @@ public class Constants {
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_SIZE = "10";
     public static final String DEFAULT_SORTED_BY_ID = "id";
-    public static final String DEFAULT_DIRECTION_ASC = "asc";
+    public static final String DEFAULT_DIRECTION_ASC = "ASC";
     public static final String DIRECTION_DESC = "DESC";
     public static final String PATH = "/";
 

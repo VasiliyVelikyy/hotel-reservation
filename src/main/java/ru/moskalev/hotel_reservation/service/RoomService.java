@@ -13,8 +13,6 @@ import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 import ru.moskalev.hotel_reservation.mapper.RoomMapper;
 import ru.moskalev.hotel_reservation.repo.RoomRepository;
 
-import java.util.Optional;
-
 import static ru.moskalev.hotel_reservation.exception.ErrorMessagesTemplates.ROOM_NOT_FOUND_TEMPLATE;
 
 @Service
@@ -28,27 +26,27 @@ public class RoomService {
     public RoomResponse create(Long hotelId, RoomCreateInput input) {
         hotelService.checkExistHotel(hotelId);
         Room savedRoom = repository.save(mapper.toEntity(input, hotelId));
-        return mapper.toOutputDto(savedRoom);
+        return mapper.toResponse(savedRoom);
     }
 
     @Transactional(readOnly = true)
     public RoomResponse getById(Long id) {
         Room room = getRoom(id);
-        return mapper.toOutputDto(room);
+        return mapper.toResponse(room);
     }
 
     @Transactional(readOnly = true)
     public Page<RoomResponse> getAllByHotelId(Long hotelId, Pageable pageable) {
         hotelService.checkExistHotel(hotelId);
         Page<Room> roomPage = repository.findByHotelId(hotelId, pageable);
-        return roomPage.map(mapper::toOutputDto);
+        return roomPage.map(mapper::toResponse);
     }
 
     @Transactional
     public RoomResponse update(Long roomId, RoomUpdateInput input) {
         Room room = getRoom(roomId);
         Room updatedRoom = mapper.updateEntity(input, room);
-        return mapper.toOutputDto(repository.save(updatedRoom));
+        return mapper.toResponse(repository.save(updatedRoom));
     }
 
     @Transactional

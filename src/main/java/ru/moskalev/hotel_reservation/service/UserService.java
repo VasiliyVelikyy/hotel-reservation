@@ -27,7 +27,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponse getUserByLogin(String login) {
         var user = findUserByLogin(login);
-        return mapper.toOutputDto(user);
+        return mapper.toResponse(user);
     }
 
     protected User findUserByLogin(String login) {
@@ -39,7 +39,7 @@ public class UserService {
     public UserResponse getUserById(Long userId) {
         var user = repository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_TEMPLATE.formatted("id", userId)));
-        return mapper.toOutputDto(user);
+        return mapper.toResponse(user);
     }
 
     @Transactional
@@ -51,7 +51,7 @@ public class UserService {
         }
         var userWithPass = hashedPassUser(mapper.toEntity(input), input.password());
         var savedUser = repository.save(userWithPass);
-        return mapper.toOutputDto(savedUser);
+        return mapper.toResponse(savedUser);
     }
 
     @Transactional
@@ -66,7 +66,7 @@ public class UserService {
         updateUserFields(user, input);
 
         var savedUser = repository.save(user);
-        return mapper.toOutputDto(savedUser);
+        return mapper.toResponse(savedUser);
     }
 
     @Transactional

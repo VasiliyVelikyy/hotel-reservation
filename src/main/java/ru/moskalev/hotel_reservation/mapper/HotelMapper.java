@@ -10,8 +10,6 @@ import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
 public interface HotelMapper {
 
@@ -19,12 +17,10 @@ public interface HotelMapper {
     //@Mapping(target = "grades", ignore = true)
     Hotel toEntity(HotelCreateInput input);
 
-    HotelResponse toOutputDto(Hotel hotel);
+    HotelResponse toResponse(Hotel hotel);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
    // @Mapping(target = "grades", ignore = true)
     Hotel updateEntity(HotelUpdateInput input, @MappingTarget Hotel hotel);
-
-    List<HotelResponse> toOutputDtoList(List<Hotel> hotels);
 }

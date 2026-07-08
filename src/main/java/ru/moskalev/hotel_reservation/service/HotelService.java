@@ -24,13 +24,13 @@ public class HotelService {
     @Transactional
     public HotelResponse create(HotelCreateInput input) {
         var savedHotel = repository.save(mapper.toEntity(input));
-        return mapper.toOutputDto(savedHotel);
+        return mapper.toResponse(savedHotel);
     }
 
     @Transactional(readOnly = true)
     public HotelResponse getById(Long id) {
         var entity = getHotel(id);
-        return mapper.toOutputDto(entity);
+        return mapper.toResponse(entity);
     }
 
     @Transactional(readOnly = true)
@@ -50,7 +50,7 @@ public class HotelService {
     public HotelResponse update(Long id, HotelUpdateInput input) {
         Hotel hotel = getHotel(id);
         var updateEntity = mapper.updateEntity(input, hotel);
-        return mapper.toOutputDto(repository.save(updateEntity));
+        return mapper.toResponse(repository.save(updateEntity));
     }
 
     @Transactional
@@ -61,7 +61,7 @@ public class HotelService {
     @Transactional(readOnly = true)
     public Page<HotelResponse> getAll(Pageable pageable) {
         Page<Hotel> hotelPage = repository.findAll(pageable);
-        return hotelPage.map(mapper::toOutputDto);
+        return hotelPage.map(mapper::toResponse);
     }
 
 }

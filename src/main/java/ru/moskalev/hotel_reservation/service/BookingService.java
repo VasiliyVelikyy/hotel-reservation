@@ -2,15 +2,14 @@ package ru.moskalev.hotel_reservation.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.moskalev.hotel_reservation.domain.Booking;
-import ru.moskalev.hotel_reservation.domain.CustomUserDetails;
-import ru.moskalev.hotel_reservation.domain.Room;
-import ru.moskalev.hotel_reservation.domain.User;
+import ru.moskalev.hotel_reservation.domain.*;
 import ru.moskalev.hotel_reservation.dto.booking.BookingCreateRequest;
 import ru.moskalev.hotel_reservation.dto.booking.BookingResponse;
 import ru.moskalev.hotel_reservation.exception.BookingException;
@@ -87,6 +86,12 @@ public class BookingService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public Page<BookingResponse> getAllBookings(Pageable pageable) {
+        Page<Booking> bookingsPage = bookingRepository.findAll(pageable);
+        return bookingsPage.map(bookingMapper::toResponse);
+    }
+
     @Transactional
     public void cancel(Long bookingId) {
         Long currentUserId = getCurrentUserId();
@@ -126,6 +131,5 @@ public class BookingService {
         }
         return userDetails.getId();
     }
-
 
 }

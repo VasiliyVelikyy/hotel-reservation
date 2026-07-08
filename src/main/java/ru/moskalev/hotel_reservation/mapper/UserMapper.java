@@ -13,5 +13,5 @@ public interface UserMapper {
     @Mapping(target = "hashPassword", ignore = true)
     User toEntity(UserCreateInput input);
 
-    UserResponse toOutputDto(User user);
+    UserResponse toResponse(User user);
 }

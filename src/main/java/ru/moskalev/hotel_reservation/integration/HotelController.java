@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
@@ -25,16 +26,19 @@ public class HotelController implements HotelApi {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public HotelResponse create(@RequestBody HotelCreateInput input) {
         return hotelService.create(input);
     }
 
     @GetMapping(HOTEL_ID)
+    @PreAuthorize("isAuthenticated()")
     public HotelResponse getById(@PathVariable Long hotelId) {
         return hotelService.getById(hotelId);
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public Page<HotelResponse> getAll(@RequestParam(defaultValue = DEFAULT_PAGE) int page,
                                       @RequestParam(defaultValue = DEFAULT_SIZE) int size,
                                       @RequestParam(defaultValue = DEFAULT_SORTED_BY_ID) String sortBy,
@@ -45,6 +49,7 @@ public class HotelController implements HotelApi {
     }
 
     @PutMapping(HOTEL_ID)
+    @PreAuthorize("hasRole('ADMIN')")
     public HotelResponse update(@PathVariable Long hotelId,
                                 @RequestBody HotelUpdateInput input) {
         return hotelService.update(hotelId, input);
@@ -52,6 +57,7 @@ public class HotelController implements HotelApi {
 
     @DeleteMapping(HOTEL_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long hotelId) {
         hotelService.delete(hotelId);
     }
