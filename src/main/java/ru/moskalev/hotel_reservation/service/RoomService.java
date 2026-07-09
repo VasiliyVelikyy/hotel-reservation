@@ -3,15 +3,18 @@ package ru.moskalev.hotel_reservation.service;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.moskalev.hotel_reservation.domain.Room;
 import ru.moskalev.hotel_reservation.dto.room.RoomCreateInput;
+import ru.moskalev.hotel_reservation.dto.room.RoomFilter;
 import ru.moskalev.hotel_reservation.dto.room.RoomResponse;
 import ru.moskalev.hotel_reservation.dto.room.RoomUpdateInput;
 import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 import ru.moskalev.hotel_reservation.mapper.RoomMapper;
 import ru.moskalev.hotel_reservation.repo.RoomRepository;
+import ru.moskalev.hotel_reservation.specification.RoomSpecification;
 
 import static ru.moskalev.hotel_reservation.exception.ErrorMessagesTemplates.ROOM_NOT_FOUND_TEMPLATE;
 
@@ -42,6 +45,20 @@ public class RoomService {
         return roomPage.map(mapper::toResponse);
     }
 
+    @Transactional(readOnly = true)
+    public Page<RoomResponse> getAllByHotelIdAndFilter(Long hotelId, RoomFilter filter, Pageable pageable) {
+        hotelService.checkExistHotel(hotelId);
+
+        Specification<Room> spec = RoomSpecification.withFilter(filter);
+
+        Specification<Room> hotelSpec = (root, query, cb) ->
+                cb.equal(root.get("hotelId"), hotelId);
+
+        Specification<Room> combinedSpec = spec.and(hotelSpec);
+
+        Page<Room> roomPage = repository.findAll(combinedSpec, pageable);
+        return roomPage.map(mapper::toResponse);
+    }
     @Transactional
     public RoomResponse update(Long roomId, RoomUpdateInput input) {
         Room room = getRoom(roomId);

@@ -1,4 +1,4 @@
-package ru.moskalev.hotel_reservation.integration;
+package ru.moskalev.hotel_reservation.integration.rest;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.moskalev.hotel_reservation.dto.grade.GradeResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelFilter;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
 import ru.moskalev.hotel_reservation.integration.api.HotelApi;
@@ -52,6 +53,18 @@ public class HotelController implements HotelApi {
         return hotelService.getAll(pageable);
     }
 
+    @PostMapping(FILTER)
+    @PreAuthorize("isAuthenticated()")
+    public Page<HotelResponse> getAllByFilter(@RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                                              @RequestParam(defaultValue = DEFAULT_SIZE) int size,
+                                              @RequestParam(defaultValue = DEFAULT_SORTED_BY_ID) String sortBy,
+                                              @RequestParam(defaultValue = DEFAULT_DIRECTION_ASC) String direction,
+                                              @RequestBody(required = false) HotelFilter filter) {
+        var sort = getSort(sortBy, direction);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return hotelService.getAllByFilter(filter, pageable);
+    }
+
     @PutMapping(HOTEL_ID)
     @PreAuthorize("hasRole('ADMIN')")
     public HotelResponse update(@PathVariable Long hotelId,
@@ -70,7 +83,7 @@ public class HotelController implements HotelApi {
     @PreAuthorize("isAuthenticated()")
     public GradeResponse rate(@PathVariable Long hotelId,
                               @RequestParam @Min(1) @Max(5) @NotNull Byte newMark) {
-       return hotelService.rate(hotelId, newMark);
+        return hotelService.rate(hotelId, newMark);
     }
 
 }

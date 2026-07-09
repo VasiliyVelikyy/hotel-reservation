@@ -1,4 +1,4 @@
-package ru.moskalev.hotel_reservation.integration;
+package ru.moskalev.hotel_reservation.integration.rest;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

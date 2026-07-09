@@ -14,10 +14,13 @@ import ru.moskalev.hotel_reservation.domain.Grade;
 import ru.moskalev.hotel_reservation.domain.Hotel;
 import ru.moskalev.hotel_reservation.dto.grade.GradeResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelFilter;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
 import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 import ru.moskalev.hotel_reservation.repo.HotelRepository;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -417,7 +420,273 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         assertThat(response.numberOfRating()).isEqualTo(3);
     }
 
-    private Hotel buildHotel(String name) {
+    @Test
+    @DisplayName("getAllByFilter: должен вернуть все отели при пустом фильтре")
+    void getAllByFilter_shouldReturnAllHotels_whenFilterIsEmpty() {
+        // given
+        Hotel hotel1 = buildHotel("Hilton Moscow");
+        hotel1.setCity("Moscow");
+        Hotel hotel2 = buildHotel("Marriott SPB");
+        hotel2.setCity("SPB");
+        Hotel hotel3 = buildHotel("Radisson Moscow");
+        hotel3.setCity("Moscow");
+
+        hotelRepository.saveAll(List.of(hotel1, hotel2, hotel3));
+
+        HotelFilter filter = new HotelFilter(null, null, null, null, null);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id"));
+
+        // when
+        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(3);
+        assertThat(result.getContent()).hasSize(3);
+    }
+
+    @Test
+    @DisplayName("getAllByFilter: должен фильтровать по городу")
+    void getAllByFilter_shouldFilterByCity() {
+        // given
+        Hotel hotel1 = buildHotel("Hilton Moscow");
+        hotel1.setCity("Moscow");
+        Hotel hotel2 = buildHotel("Marriott SPB");
+        hotel2.setCity("SPB");
+        Hotel hotel3 = buildHotel("Radisson Moscow");
+        hotel3.setCity("Moscow");
+
+        hotelRepository.saveAll(List.of(hotel1, hotel2, hotel3));
+
+        HotelFilter filter = new HotelFilter("Moscow", null, null, null, null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getContent())
+                .allSatisfy(hotel -> assertThat(hotel.city()).isEqualTo("Moscow"));
+    }
+
+    @Test
+    @DisplayName("getAllByFilter: должен фильтровать по части названия (nameContains)")
+    void getAllByFilter_shouldFilterByNameContains() {
+        // given
+        Hotel hotel1 = buildHotel("Grand Hotel Moscow");
+        hotel1.setCity("Moscow");
+        Hotel hotel2 = buildHotel("Marriott SPB");
+        hotel2.setCity("SPB");
+        Hotel hotel3 = buildHotel("Grand Palace");
+        hotel3.setCity("Moscow");
+
+        hotelRepository.saveAll(List.of(hotel1, hotel2, hotel3));
+
+        HotelFilter filter = new HotelFilter(null, "Grand", null, null, null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getContent())
+                .allSatisfy(hotel -> assertThat(hotel.name()).containsIgnoringCase("Grand"));
+    }
+
+    @Test
+    @DisplayName("getAllByFilter: должен фильтровать по минимальному расстоянию")
+    void getAllByFilter_shouldFilterByMinDistance() {
+        // given
+        Hotel hotel1 = buildHotel("Hotel Near");
+        hotel1.setDistance(100);
+        Hotel hotel2 = buildHotel("Hotel Medium");
+        hotel2.setDistance(500);
+        Hotel hotel3 = buildHotel("Hotel Far");
+        hotel3.setDistance(1000);
+
+        hotelRepository.saveAll(List.of(hotel1, hotel2, hotel3));
+
+        HotelFilter filter = new HotelFilter(null, null, 500, null, null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getContent())
+                .allSatisfy(hotel -> assertThat(hotel.distance()).isGreaterThanOrEqualTo(500));
+    }
+
+    @Test
+    @DisplayName("getAllByFilter: должен фильтровать по максимальному расстоянию")
+    void getAllByFilter_shouldFilterByMaxDistance() {
+        // given
+        Hotel hotel1 = buildHotel("Hotel Near");
+        hotel1.setDistance(100);
+        Hotel hotel2 = buildHotel("Hotel Medium");
+        hotel2.setDistance(500);
+        Hotel hotel3 = buildHotel("Hotel Far");
+        hotel3.setDistance(1000);
+
+        hotelRepository.saveAll(List.of(hotel1, hotel2, hotel3));
+
+        HotelFilter filter = new HotelFilter(null, null, null, 500, null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getContent())
+                .allSatisfy(hotel -> assertThat(hotel.distance()).isLessThanOrEqualTo(500));
+    }
+
+    @Test
+    @DisplayName("getAllByFilter: должен фильтровать по диапазону расстояний")
+    void getAllByFilter_shouldFilterByDistanceRange() {
+        // given
+        Hotel hotel1 = buildHotel("Hotel Near");
+        hotel1.setDistance(100);
+        Hotel hotel2 = buildHotel("Hotel Medium");
+        hotel2.setDistance(500);
+        Hotel hotel3 = buildHotel("Hotel Far");
+        hotel3.setDistance(1000);
+
+        hotelRepository.saveAll(List.of(hotel1, hotel2, hotel3));
+
+        HotelFilter filter = new HotelFilter(null, null, 200, 800, null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).name()).isEqualTo("Hotel Medium");
+        assertThat(result.getContent().get(0).distance()).isEqualTo(500);
+    }
+
+    @Test
+    @DisplayName("getAllByFilter: должен фильтровать по минимальному рейтингу")
+    void getAllByFilter_shouldFilterByMinRating() {
+        // given
+        Hotel hotel1 = buildHotel("Hotel Low Rating");
+        hotel1.setGrade(new Grade(2.0, 10.0, 5));
+        Hotel hotel2 = buildHotel("Hotel Medium Rating");
+        hotel2.setGrade(new Grade(4.0, 20.0, 5));
+        Hotel hotel3 = buildHotel("Hotel High Rating");
+        hotel3.setGrade(new Grade(4.8, 24.0, 5));
+
+        hotelRepository.saveAll(List.of(hotel1, hotel2, hotel3));
+
+        HotelFilter filter = new HotelFilter(null, null, null, null, 4.0);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getContent())
+                .allSatisfy(hotel -> assertThat(hotel.rating()).isGreaterThanOrEqualTo(4.0));
+    }
+
+    @Test
+    @DisplayName("getAllByFilter: должен применять комбинированную фильтрацию")
+    void getAllByFilter_shouldApplyCombinedFilter() {
+        // given
+        Hotel hotel1 = buildHotel("Grand Hotel Moscow");
+        hotel1.setCity("Moscow");
+        hotel1.setDistance(500);
+        hotel1.setGrade(new Grade(4.5, 45.0, 10));
+
+        Hotel hotel2 = buildHotel("Marriott SPB");
+        hotel2.setCity("SPB");
+        hotel2.setDistance(300);
+        hotel2.setGrade(new Grade(4.2, 42.0, 10));
+
+        Hotel hotel3 = buildHotel("Grand Palace Moscow");
+        hotel3.setCity("Moscow");
+        hotel3.setDistance(1000);
+        hotel3.setGrade(new Grade(3.5, 35.0, 10));
+
+        hotelRepository.saveAll(List.of(hotel1, hotel2, hotel3));
+
+        HotelFilter filter = new HotelFilter("Moscow", "Grand", 200, 800, 4.0);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).name()).isEqualTo("Grand Hotel Moscow");
+        assertThat(result.getContent().get(0).city()).isEqualTo("Moscow");
+        assertThat(result.getContent().get(0).distance()).isEqualTo(500);
+        assertThat(result.getContent().get(0).rating()).isEqualTo(4.5);
+    }
+
+    @Test
+    @DisplayName("getAllByFilter: должен работать с пагинацией")
+    void getAllByFilter_shouldWorkWithPagination() {
+        // given
+        for (int i = 1; i <= 15; i++) {
+            Hotel hotel = buildHotel("Hotel " + i);
+            hotel.setCity("Moscow");
+            hotelRepository.save(hotel);
+        }
+
+        HotelFilter filter = new HotelFilter("Moscow", null, null, null, null);
+        Pageable pageable = PageRequest.of(0, 5);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(15);
+        assertThat(result.getContent()).hasSize(5);
+        assertThat(result.getTotalPages()).isEqualTo(3);
+        assertThat(result.getNumber()).isZero();
+    }
+
+    @Test
+    @DisplayName("getAllByFilter: должен вернуть пустую страницу, если ничего не найдено")
+    void getAllByFilter_shouldReturnEmptyPage_whenNoResults() {
+        // given
+        Hotel hotel1 = buildHotel("Hilton Moscow");
+        hotel1.setCity("Moscow");
+        Hotel hotel2 = buildHotel("Marriott SPB");
+        hotel2.setCity("SPB");
+
+        hotelRepository.saveAll(List.of(hotel1, hotel2));
+
+        HotelFilter filter = new HotelFilter("Kazan", null, null, null, null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isZero();
+        assertThat(result.getContent()).isEmpty();
+    }
+
+
+
+    public static Hotel buildHotel(String name) {
         Hotel hotel = new Hotel();
         hotel.setName(name);
         hotel.setDescription("Description");

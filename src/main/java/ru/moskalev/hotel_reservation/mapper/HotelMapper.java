@@ -11,6 +11,7 @@ import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
 public interface HotelMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "rating", ignore = true)
     @Mapping(target = "grade", expression = "java(initialGrade())")
     Hotel toEntity(HotelCreateInput input);
 
@@ -21,6 +22,7 @@ public interface HotelMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "rating", ignore = true)
     @Mapping(target = "grade", ignore = true)
     Hotel updateEntity(HotelUpdateInput input, @MappingTarget Hotel hotel);
 

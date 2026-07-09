@@ -27,6 +27,9 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
     implementation ("org.springframework.boot:spring-boot-starter-security")
     implementation ("org.bouncycastle:bcprov-jdk18on:1.78.1")
+    implementation("org.springframework.kafka:spring-kafka")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    implementation("com.opencsv:opencsv:5.7.1")
 
 	compileOnly("org.projectlombok:lombok")
 

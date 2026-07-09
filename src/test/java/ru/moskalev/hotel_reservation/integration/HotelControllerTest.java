@@ -5,20 +5,21 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.moskalev.hotel_reservation.dto.grade.GradeResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelFilter;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
 import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
+import ru.moskalev.hotel_reservation.integration.rest.HotelController;
 import ru.moskalev.hotel_reservation.service.HotelService;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +40,7 @@ class HotelControllerTest {
     private HotelService hotelService;
 
     private static final String BASE_URL = V1 + HOTEL;
+
     private static final Long HOTEL_ID_VALUE = 1L;
 
     @Test
@@ -150,7 +152,7 @@ class HotelControllerTest {
                 "Best Hotel",
                 "Moscow",
                 "Tverskaya 1",
-                1500, 0D,0D,0
+                1500, 0D, 0D, 0
         );
         when(hotelService.getById(HOTEL_ID_VALUE)).thenReturn(expected);
 
@@ -182,11 +184,11 @@ class HotelControllerTest {
         List<HotelResponse> content = List.of(
                 new HotelResponse(
                         1L, "Hilton", "Desc 1", "Title 1",
-                        "Moscow", "Address 1", 1500, 0D,0D,0
+                        "Moscow", "Address 1", 1500, 0D, 0D, 0
                 ),
                 new HotelResponse(
                         2L, "Marriott", "Desc 2", "Title 2",
-                        "SPB", "Address 2", 2000,0D,0D,0
+                        "SPB", "Address 2", 2000, 0D, 0D, 0
                 )
         );
         Page<HotelResponse> page = new PageImpl<>(content);
@@ -278,7 +280,7 @@ class HotelControllerTest {
                 "Old Title",
                 "Old City",
                 "Old Address",
-                1000,0D,0D,0
+                1000, 0D, 0D, 0
         );
 
         when(hotelService.update(eq(HOTEL_ID_VALUE), any(HotelUpdateInput.class)))
@@ -350,67 +352,158 @@ class HotelControllerTest {
                 .andExpect(jsonPath("$.description").value("Hotel with id 999 not found"));
     }
 
-        @Test
-        @WithMockUser(username = "testUser")
-        @DisplayName("POST /{hotelId}/grade — 200 — оценка успешно поставлена")
-        void rate_success() throws Exception {
-            Byte newMark = 5;
-            GradeResponse expected = new GradeResponse(HOTEL_ID_VALUE,5.0, 25.0, 5);
+    @Test
+    @WithMockUser(username = "testUser")
+    @DisplayName("POST /{hotelId}/grade — 200 — оценка успешно поставлена")
+    void rate_success() throws Exception {
+        Byte newMark = 5;
+        GradeResponse expected = new GradeResponse(HOTEL_ID_VALUE, 5.0, 25.0, 5);
 
-            when(hotelService.rate(eq(HOTEL_ID_VALUE), eq(newMark))).thenReturn(expected);
+        when(hotelService.rate(eq(HOTEL_ID_VALUE), eq(newMark))).thenReturn(expected);
 
-            mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE)
-                            .param("newMark", newMark.toString()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.rating").value(5.0))
-                    .andExpect(jsonPath("$.totalRating").value(25.0))
-                    .andExpect(jsonPath("$.numberOfRating").value(5));
+        mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE)
+                        .param("newMark", newMark.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rating").value(5.0))
+                .andExpect(jsonPath("$.totalRating").value(25.0))
+                .andExpect(jsonPath("$.numberOfRating").value(5));
 
-            verify(hotelService).rate(HOTEL_ID_VALUE, newMark);
-        }
+        verify(hotelService).rate(HOTEL_ID_VALUE, newMark);
+    }
 
-        @Test
-        @WithMockUser(username = "testUser")
-        @DisplayName("POST /{hotelId}/grade — 400 — оценка меньше 1")
-        void rate_badRequest_markTooLow() throws Exception {
-            Byte invalidMark = 0;
+    @Test
+    @WithMockUser(username = "testUser")
+    @DisplayName("POST /{hotelId}/grade — 400 — оценка меньше 1")
+    void rate_badRequest_markTooLow() throws Exception {
+        Byte invalidMark = 0;
 
-            mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE)
-                            .param("newMark", invalidMark.toString()))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.statusCode").value(400))
-                    .andExpect(jsonPath("$.message").value("Validation Failed"))
-                    .andExpect(jsonPath("$.timestamp").exists());
+        mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE)
+                        .param("newMark", invalidMark.toString()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusCode").value(400))
+                .andExpect(jsonPath("$.message").value("Validation Failed"))
+                .andExpect(jsonPath("$.timestamp").exists());
 
-            verify(hotelService, never()).rate(anyLong(), anyByte());
-        }
+        verify(hotelService, never()).rate(anyLong(), anyByte());
+    }
 
-        @Test
-        @WithMockUser(username = "testUser")
-        @DisplayName("POST /{hotelId}/grade — 400 — оценка больше 5")
-        void rate_badRequest_markTooHigh() throws Exception {
-            Byte invalidMark = 6;
+    @Test
+    @WithMockUser(username = "testUser")
+    @DisplayName("POST /{hotelId}/grade — 400 — оценка больше 5")
+    void rate_badRequest_markTooHigh() throws Exception {
+        Byte invalidMark = 6;
 
-            mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE)
-                            .param("newMark", invalidMark.toString()))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.statusCode").value(400))
-                    .andExpect(jsonPath("$.message").value("Validation Failed"))
-                    .andExpect(jsonPath("$.timestamp").exists());
+        mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE)
+                        .param("newMark", invalidMark.toString()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusCode").value(400))
+                .andExpect(jsonPath("$.message").value("Validation Failed"))
+                .andExpect(jsonPath("$.timestamp").exists());
 
-            verify(hotelService, never()).rate(anyLong(), anyByte());
-        }
+        verify(hotelService, never()).rate(anyLong(), anyByte());
+    }
 
-        @Test
-        @DisplayName("POST /{hotelId}/grade — 400 — отсутствует параметр newMark")
-        void rate_badRequest_missingMark() throws Exception {
-            mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.statusCode").value(400))
-                    .andExpect(jsonPath("$.message").value("Validation Failed"))
-                    .andExpect(jsonPath("$.timestamp").exists());
+    @Test
+    @DisplayName("POST /{hotelId}/grade — 400 — отсутствует параметр newMark")
+    void rate_badRequest_missingMark() throws Exception {
+        mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusCode").value(400))
+                .andExpect(jsonPath("$.message").value("Validation Failed"))
+                .andExpect(jsonPath("$.timestamp").exists());
 
-            verify(hotelService, never()).rate(anyLong(), anyByte());
-        }
+        verify(hotelService, never()).rate(anyLong(), anyByte());
+    }
+
+    @Test
+    @DisplayName("POST /hotel/filter — 200 — фильтрация по городу")
+    void search_filterByCity() throws Exception {
+        HotelResponse hotel1 = new HotelResponse(
+                1L, "Hilton", "Luxury hotel", "Best Hotel", "Moscow", "Tverskaya 1", 1500, 4.5, 100.0, 20
+        );
+
+        Page<HotelResponse> page = new PageImpl<>(
+                List.of(hotel1),
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id")),
+                1
+        );
+
+        when(hotelService.getAllByFilter(any(HotelFilter.class), any(Pageable.class)))
+                .thenReturn(page);
+
+        HotelFilter filter = new HotelFilter("Moscow", null, null, null, null);
+
+        mockMvc.perform(post(BASE_URL + FILTER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(filter)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].city").value("Moscow"));
+
+        verify(hotelService).getAllByFilter(
+                argThat(f -> f.city() != null && f.city().equals("Moscow")),
+                any(Pageable.class)
+        );
+    }
+
+    @Test
+    @DisplayName("POST /hotel/filter — 200 — комбинированная фильтрация")
+    void search_combinedFilter() throws Exception {
+        Page<HotelResponse> page = new PageImpl<>(Collections.emptyList());
+
+        when(hotelService.getAllByFilter(any(HotelFilter.class), any(Pageable.class)))
+                .thenReturn(page);
+
+        HotelFilter filter = new HotelFilter(
+                "Moscow",
+                "Hilton",
+                500,
+                5000,
+                4.0
+        );
+
+        mockMvc.perform(post(BASE_URL + FILTER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(filter)))
+                .andExpect(status().isOk());
+
+        verify(hotelService).getAllByFilter(
+                argThat(f ->
+                        f.city() != null &&
+                                f.nameContains() != null &&
+                                f.minDistance() != null &&
+                                f.maxDistance() != null &&
+                                f.minRating() != null
+                ),
+                any(Pageable.class)
+        );
+    }
+
+    @Test
+    @DisplayName("POST /hotel/filter — 200 — пустой фильтр (все отели)")
+    void search_emptyFilter() throws Exception {
+        Page<HotelResponse> page = new PageImpl<>(Collections.emptyList());
+
+        when(hotelService.getAllByFilter(any(HotelFilter.class), any(Pageable.class)))
+                .thenReturn(page);
+
+        HotelFilter filter = new HotelFilter(null, null, null, null, null);
+
+        mockMvc.perform(post(BASE_URL + FILTER)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(filter)))
+                .andExpect(status().isOk());
+
+        verify(hotelService).getAllByFilter(
+                argThat(f ->
+                        f.city() == null &&
+                                f.nameContains() == null &&
+                                f.minDistance() == null &&
+                                f.maxDistance() == null &&
+                                f.minRating() == null
+                ),
+                any(Pageable.class)
+        );
+    }
 
 }

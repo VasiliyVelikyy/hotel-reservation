@@ -8,21 +8,31 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import ru.moskalev.hotel_reservation.domain.Booking;
 import ru.moskalev.hotel_reservation.domain.Hotel;
 import ru.moskalev.hotel_reservation.domain.Room;
+import ru.moskalev.hotel_reservation.domain.User;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
 import ru.moskalev.hotel_reservation.dto.room.RoomCreateInput;
+import ru.moskalev.hotel_reservation.dto.room.RoomFilter;
 import ru.moskalev.hotel_reservation.dto.room.RoomResponse;
 import ru.moskalev.hotel_reservation.dto.room.RoomUpdateInput;
+import ru.moskalev.hotel_reservation.enumeration.UserRole;
 import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
+import ru.moskalev.hotel_reservation.repo.BookingRepository;
 import ru.moskalev.hotel_reservation.repo.HotelRepository;
 import ru.moskalev.hotel_reservation.repo.RoomRepository;
+import ru.moskalev.hotel_reservation.repo.UserRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.moskalev.hotel_reservation.TestConstants.ADDRESS;
+import static ru.moskalev.hotel_reservation.service.HotelServiceIntegrationTest.buildHotel;
 
 @DisplayName("RoomService")
 class RoomServiceIntegrationTest extends BaseIntegrationTest {
@@ -39,10 +49,18 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private HotelRepository hotelRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private BookingRepository bookingRepository;
+
     @AfterEach
     void cleanUp() {
-        roomRepository.deleteAll();
-        hotelRepository.deleteAll();
+        bookingRepository.deleteAllInBatch();
+        roomRepository.deleteAllInBatch();
+        hotelRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
     }
 
     @Test
@@ -350,6 +368,120 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
                 .hasMessageContaining(nonExistentId.toString());
     }
 
+    @Test
+    @DisplayName("должен вернуть все комнаты отеля при пустом фильтре")
+    void getAllByHotelId_shouldReturnAllRooms_whenFilterIsEmpty() {
+        // given
+        Hotel hotel = hotelRepository.save(buildHotel("Test Hotel"));
+        Room room1 = buildRoom("Room 1", hotel, (short) 1, BigDecimal.valueOf(1000), (byte) 2);
+        Room room2 = buildRoom("Room 2", hotel, (short) 2, BigDecimal.valueOf(2000), (byte) 4);
+        roomRepository.saveAll(List.of(room1, room2));
+
+        RoomFilter filter = new RoomFilter(null, null, null, null, null, null, null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<RoomResponse> result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("должен фильтровать по диапазону цен")
+    void getAllByHotelId_shouldFilterByPriceRange() {
+        // given
+        Hotel hotel = hotelRepository.save(buildHotel("Test Hotel"));
+        Room room1 = buildRoom("Cheap", hotel, (short) 1, BigDecimal.valueOf(500), (byte) 2);
+        Room room2 = buildRoom("Medium", hotel, (short) 2, BigDecimal.valueOf(2000), (byte) 2);
+        Room room3 = buildRoom("Expensive", hotel, (short) 3, BigDecimal.valueOf(5000), (byte) 2);
+        roomRepository.saveAll(List.of(room1, room2, room3));
+
+        RoomFilter filter = new RoomFilter(null, null, BigDecimal.valueOf(1000), BigDecimal.valueOf(3000), null, null, null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<RoomResponse> result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).name()).isEqualTo("Medium");
+    }
+
+    @Test
+    @DisplayName("должен фильтровать по вместимости")
+    void getAllByHotelId_shouldFilterByGuestCount() {
+        // given
+        Hotel hotel = hotelRepository.save(buildHotel("Test Hotel"));
+        Room room1 = buildRoom("Small", hotel, (short) 1, BigDecimal.valueOf(1000), (byte) 1);
+        Room room2 = buildRoom("Big", hotel, (short) 2, BigDecimal.valueOf(2000), (byte) 4);
+        roomRepository.saveAll(List.of(room1, room2));
+
+        RoomFilter filter = new RoomFilter(null, null, null, null, 2, null, null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<RoomResponse> result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).name()).isEqualTo("Big");
+    }
+
+    @Test
+    @DisplayName("должен вернуть только свободные комнаты на указанные даты")
+    void getAllByHotelId_shouldReturnOnlyFreeRoomsForDates() {
+        // given
+        Hotel hotel = hotelRepository.save(buildHotel("Test Hotel"));
+        Room room1 = buildRoom("Room 1", hotel, (short) 1, BigDecimal.valueOf(1000), (byte) 2);
+        Room room2 = buildRoom("Room 2", hotel, (short) 2, BigDecimal.valueOf(2000), (byte) 2);
+        roomRepository.saveAll(List.of(room1, room2));
+
+        User user = userRepository.save(buildUser("testUser"));
+
+        // Бронирование для room1: 10 июля - 15 июля 2026
+        long bookingStart = LocalDate.of(2026, 7, 10).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+        long bookingEnd = LocalDate.of(2026, 7, 15).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+        Booking booking = new Booking(null, bookingStart, bookingEnd, 2, room1, user);
+        bookingRepository.save(booking);
+
+        // Запрос на 12 июля - 14 июля (пересекается с бронированием)
+        long filterStart = LocalDate.of(2026, 7, 12).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+        long filterEnd = LocalDate.of(2026, 7, 14).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+
+        RoomFilter filter = new RoomFilter(null, null, null, null, null, filterStart, filterEnd);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<RoomResponse> result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).name()).isEqualTo("Room 2");
+    }
+
+    @Test
+    @DisplayName("не должен применять фильтр по датам, если указано только одно поле")
+    void getAllByHotelId_shouldNotFilterByDates_whenOnlyOneDateProvided() {
+        // given
+        Hotel hotel = hotelRepository.save(buildHotel("Test Hotel"));
+        Room room1 = buildRoom("Room 1", hotel, (short) 1, BigDecimal.valueOf(1000), (byte) 2);
+        roomRepository.save(room1);
+
+        long filterStart = LocalDate.of(2026, 7, 12).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+
+        // Только startDate, без endDate
+        RoomFilter filter = new RoomFilter(null, null, null, null, null, filterStart, null);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<RoomResponse> result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(1); // фильтр по датам не сработал
+    }
+
+
     private Room buildRoom(Long hotelId, String name) {
         Room room = new Room();
         room.setName(name);
@@ -362,5 +494,29 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
                 .orElseThrow(() -> new EntityNotFoundException("Hotel not found"));
         room.setHotel(hotel);
         return room;
+    }
+
+    private Room buildRoom(String name, Hotel hotel, short number, BigDecimal price, byte maxCount) {
+        Room room = new Room();
+        room.setName(name);
+        room.setDescription("Description for " + name);
+        room.setNumber(number);
+        room.setPrice(price);
+        room.setMaxCount(maxCount);
+        room.setHotel(hotel);
+        return room;
+    }
+
+    private User buildUser(String login, String email, String hashPassword, UserRole role) {
+        User user = new User();
+        user.setLogin(login);
+        user.setEmail(email);
+        user.setHashPassword(hashPassword);
+        user.setRole(role);
+        return user;
+    }
+
+    private User buildUser(String login) {
+        return buildUser(login, login + "@test.com", "hashedPassword123", UserRole.CLIENT);
     }
 }

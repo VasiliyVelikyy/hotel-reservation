@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.moskalev.hotel_reservation.domain.User;
+import ru.moskalev.hotel_reservation.dto.kafka.UserRegisteredEvent;
 import ru.moskalev.hotel_reservation.dto.user.UserCreateInput;
 import ru.moskalev.hotel_reservation.dto.user.UserResponse;
 import ru.moskalev.hotel_reservation.dto.user.UserUpdateInput;
@@ -23,6 +24,7 @@ public class UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
+    private final KafkaStatsPublisher kafkaStatsPublisher;
 
     @Transactional(readOnly = true)
     public UserResponse getUserByLogin(String login) {
@@ -51,6 +53,8 @@ public class UserService {
         }
         var userWithPass = hashedPassUser(mapper.toEntity(input), input.password());
         var savedUser = repository.save(userWithPass);
+
+        kafkaStatsPublisher.publishUserEvent(new UserRegisteredEvent(savedUser.getId()));
         return mapper.toResponse(savedUser);
     }
 
@@ -106,6 +110,6 @@ public class UserService {
 
 
     public User getReferenceById(Long userId) {
-    return repository.getReferenceById(userId);
+        return repository.getReferenceById(userId);
     }
 }

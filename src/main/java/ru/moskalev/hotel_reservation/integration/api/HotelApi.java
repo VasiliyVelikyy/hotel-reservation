@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.moskalev.hotel_reservation.dto.ErrorResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelFilter;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
 
@@ -80,14 +81,39 @@ public interface HotelApi {
             )
     })
     @GetMapping
-    Page<HotelResponse> getAll(@Parameter(description = "Номер страницы (начинается с 0)")
-                               int page,
-                               @Parameter(description = "Размер страницы")
-                               int size,
-                               @Parameter(description = "Поле для сортировки")
-                               String sortBy,
-                               @Parameter(description = "Направление сортировки (asc/desc)")
-                               String direction);
+    Page<HotelResponse> getAll(@Parameter(description = "Номер страницы (начинается с 0)", example = "0") int page,
+                               @Parameter(description = "Размер страницы", example = "10") int size,
+                               @Parameter(description = "Поле для сортировки", example = "id") String sortBy,
+                               @Parameter(description = "Направление сортировки (asc/desc)", example = "asc") String direction);
+
+    @Operation(
+            summary = "Получить список отелей с фильтрацией",
+            description = "Возвращает страницу отелей с возможностью фильтрации по городу, названию, расстоянию и рейтингу. " +
+                    "Если фильтр не передан или все его поля пустые — возвращаются все отели."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Отели успешно найдены",
+                    content = @Content(schema = @Schema(implementation = Page.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Невалидные параметры фильтрации или пагинации",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Пользователь не авторизован",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    Page<HotelResponse> getAllByFilter(@Parameter(description = "Номер страницы (начинается с 0)", example = "0") int page,
+                                       @Parameter(description = "Размер страницы", example = "10") int size,
+                                       @Parameter(description = "Поле для сортировки", example = "id") String sortBy,
+                                       @Parameter(description = "Направление сортировки (asc/desc)", example = "asc") String direction,
+                                       @RequestBody(description = "Фильтр для поиска отелей. Все поля опциональны.")
+                                       @Valid HotelFilter filter);
 
     @Operation(
             summary = "Обновить отель",

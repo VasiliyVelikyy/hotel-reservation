@@ -26,13 +26,32 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
-
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/stats_db
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: hotel-reservation-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerialize
+    topics:
+      user: user-registration-topic
+      booking: room-booking-topic
 logging:
   level:
     # при дебагинге DEBUG /OFF
     org.hibernate.SQL: DEBUG
     # при дебагинге TRACE /OFF
     org.hibernate.orm.jdbc.bind: TRACE
+    org.apache.kafka: DEBUG
+    org.springframework.kafka: DEBUG
 
 #Сваггер
 springdoc:

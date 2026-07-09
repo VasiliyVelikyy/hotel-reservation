@@ -40,6 +40,88 @@ GET {{baseUrl}}?page=0&size=10&sortBy=id&direction=asc
 Accept: application/json
 Authorization: Basic {{adminLogin}} {{adminPass}}
 
+
+### 2.1 Получение всех отелей с с фильтрацией через POST  (с пагинацией и сортировкой)
+POST {{baseUrl}}/filter?page=0&size=10&sortBy=id&direction=asc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "city": "Moscow",
+  "nameContains": "Grand",
+  "minDistance": 500,
+  "maxDistance": 5000,
+  "minRating": 4.0
+}
+
+### 2.2. Фильтрация только по городу
+POST {{baseUrl}}/filter?page=0&size=10&sortBy=id&direction=asc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "city": "Moscow"
+}
+
+### 2.3. Фильтрация по части названия (case-insensitive)
+POST {{baseUrl}}/filter?page=0&size=10&sortBy=name&direction=asc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "nameContains": "hotel"
+}
+
+### 2.4. Фильтрация по диапазону расстояний
+POST {{baseUrl}}/filter?page=0&size=10&sortBy=distance&direction=asc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "minDistance": 500,
+  "maxDistance": 2000
+}
+
+### 2.5. Фильтрация по минимальному рейтингу
+POST {{baseUrl}}/filter?page=0&size=10&sortBy=rating&direction=desc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "minRating": 3.0
+}
+
+### 2.6. Комбинированная фильтрация (все параметры)
+POST {{baseUrl}}/filter?page=0&size=5&sortBy=id&direction=asc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "city": "Moscow",
+  "nameContains": "Grand",
+  "minRating": 3.0
+}
+
+### 2.7. Пустой фильтр (вернуть все отели)
+POST {{baseUrl}}/filter?page=0&size=10&sortBy=id&direction=asc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{}
+
+### 2.8. Фильтрация без тела запроса
+POST {{baseUrl}}/filter?page=0&size=10&sortBy=id&direction=asc
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+
 ### 3. Получение отеля по ID (GET)
 ### ======================================================================
 # Переменная {{hotelId}} подставится автоматически из шага 1,
@@ -71,3 +153,4 @@ Authorization: Basic {{adminLogin}} {{adminPass}}
 GET {{baseUrl}}/{{hotelId}}
 Accept: application/json
 Authorization: Basic {{adminLogin}} {{adminPass}}
+
