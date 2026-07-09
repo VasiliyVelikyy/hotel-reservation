@@ -1,0 +1,97 @@
+### Переменные окружения
+@host = http://localhost:8090
+@baseUrl = {{host}}/v1/hotel
+
+### Переменные для тестов
+@adminLogin = testLogin
+@adminPass = qwertyui
+@clientLogin = clientTestLogin
+@clientPass = qwertyui
+
+
+### 0. Если в базе нет пользователя то создать
+POST {{host}}/v1/user
+Content-Type: application/json
+Accept: application/json
+
+{
+  "login": "testLogin",
+  "email": "test@mail.dev",
+  "password": "qwertyui",
+  "role": "ADMIN"
+}
+
+### 1. Создание отеля (POST)
+POST {{baseUrl}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "name": "Grand Hotel",
+  "description": "Luxury hotel in the city center with a great view",
+  "title": "The Grand Experience",
+  "city": "Moscow",
+  "address": "Tverskaya street, 1",
+  "distance": 1500
+}
+
+> {%
+    // Автоматически сохраняем ID созданного отеля в глобальную переменную
+    client.global.set("hotelId", response.body.id);
+    client.log("Отель успешно создан. Присвоен ID: " + response.body.id);
+
+    client.test("Создание отеля прошло успешно", function() {
+        client.assert(response.status === 201, "Ожидался статус 201, получен " + response.status);
+    });
+%}
+
+### Оценка отеля - первая оценка (5)
+POST {{baseUrl}}/{{hotelId}}/grade?newMark=5
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+
+### Оценка отеля - вторая оценка (4)
+POST {{baseUrl}}/{{hotelId}}/grade?newMark=4
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### Оценка отеля - третья оценка (3)
+POST {{baseUrl}}/{{hotelId}}/grade?newMark=3
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### Оценка отеля - минимальная оценка (1)
+POST{{baseUrl}}/{{hotelId}}/grade?newMark=1
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### Оценка отеля - максимальная оценка (5)
+POST {{baseUrl}}/{{hotelId}}/grade?newMark=5
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### Ошибка: оценка меньше 1 (должна вернуть 400)
+POST {{baseUrl}}/{{hotelId}}/grade?newMark=0
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### Ошибка: оценка больше 5 (должна вернуть 400)
+POST {{baseUrl}}/{{hotelId}}/grade?newMark=6
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### Ошибка: отель не найден (должна вернуть 404)
+POST {{baseUrl}}/9999/grade?newMark=5
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### Ошибка: без авторизации (должна вернуть 401)
+POST {{baseUrl}}/{{hotelId}}/grade?newMark=5
+Accept: application/json
+
+### Получение дто отеля с рейтингом
+GET {{baseUrl}}/{{hotelId}}
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
