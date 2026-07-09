@@ -9,8 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.moskalev.hotel_reservation.dto.grade.GradeResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
@@ -58,7 +60,10 @@ class HotelControllerTest {
                 "Best Hotel",
                 "Moscow",
                 "Tverskaya 1",
-                1500
+                1500,
+                0D,
+                0D,
+                0
         );
 
         when(hotelService.create(any(HotelCreateInput.class))).thenReturn(expected);
@@ -145,7 +150,7 @@ class HotelControllerTest {
                 "Best Hotel",
                 "Moscow",
                 "Tverskaya 1",
-                1500
+                1500, 0D,0D,0
         );
         when(hotelService.getById(HOTEL_ID_VALUE)).thenReturn(expected);
 
@@ -177,11 +182,11 @@ class HotelControllerTest {
         List<HotelResponse> content = List.of(
                 new HotelResponse(
                         1L, "Hilton", "Desc 1", "Title 1",
-                        "Moscow", "Address 1", 1500
+                        "Moscow", "Address 1", 1500, 0D,0D,0
                 ),
                 new HotelResponse(
                         2L, "Marriott", "Desc 2", "Title 2",
-                        "SPB", "Address 2", 2000
+                        "SPB", "Address 2", 2000,0D,0D,0
                 )
         );
         Page<HotelResponse> page = new PageImpl<>(content);
@@ -232,7 +237,10 @@ class HotelControllerTest {
                 "New Title",
                 "New City",
                 "New Address",
-                1500
+                1500,
+                0D,
+                0D,
+                0
         );
 
         when(hotelService.update(eq(HOTEL_ID_VALUE), any(HotelUpdateInput.class)))
@@ -270,7 +278,7 @@ class HotelControllerTest {
                 "Old Title",
                 "Old City",
                 "Old Address",
-                1000
+                1000,0D,0D,0
         );
 
         when(hotelService.update(eq(HOTEL_ID_VALUE), any(HotelUpdateInput.class)))
@@ -341,5 +349,68 @@ class HotelControllerTest {
                 .andExpect(jsonPath("$.message").value("Not Found"))
                 .andExpect(jsonPath("$.description").value("Hotel with id 999 not found"));
     }
+
+        @Test
+        @WithMockUser(username = "testUser")
+        @DisplayName("POST /{hotelId}/grade — 200 — оценка успешно поставлена")
+        void rate_success() throws Exception {
+            Byte newMark = 5;
+            GradeResponse expected = new GradeResponse(HOTEL_ID_VALUE,5.0, 25.0, 5);
+
+            when(hotelService.rate(eq(HOTEL_ID_VALUE), eq(newMark))).thenReturn(expected);
+
+            mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE)
+                            .param("newMark", newMark.toString()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.rating").value(5.0))
+                    .andExpect(jsonPath("$.totalRating").value(25.0))
+                    .andExpect(jsonPath("$.numberOfRating").value(5));
+
+            verify(hotelService).rate(HOTEL_ID_VALUE, newMark);
+        }
+
+        @Test
+        @WithMockUser(username = "testUser")
+        @DisplayName("POST /{hotelId}/grade — 400 — оценка меньше 1")
+        void rate_badRequest_markTooLow() throws Exception {
+            Byte invalidMark = 0;
+
+            mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE)
+                            .param("newMark", invalidMark.toString()))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.statusCode").value(400))
+                    .andExpect(jsonPath("$.message").value("Validation Failed"))
+                    .andExpect(jsonPath("$.timestamp").exists());
+
+            verify(hotelService, never()).rate(anyLong(), anyByte());
+        }
+
+        @Test
+        @WithMockUser(username = "testUser")
+        @DisplayName("POST /{hotelId}/grade — 400 — оценка больше 5")
+        void rate_badRequest_markTooHigh() throws Exception {
+            Byte invalidMark = 6;
+
+            mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE)
+                            .param("newMark", invalidMark.toString()))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.statusCode").value(400))
+                    .andExpect(jsonPath("$.message").value("Validation Failed"))
+                    .andExpect(jsonPath("$.timestamp").exists());
+
+            verify(hotelService, never()).rate(anyLong(), anyByte());
+        }
+
+        @Test
+        @DisplayName("POST /{hotelId}/grade — 400 — отсутствует параметр newMark")
+        void rate_badRequest_missingMark() throws Exception {
+            mockMvc.perform(post(BASE_URL + "/{hotelId}/grade", HOTEL_ID_VALUE))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.statusCode").value(400))
+                    .andExpect(jsonPath("$.message").value("Validation Failed"))
+                    .andExpect(jsonPath("$.timestamp").exists());
+
+            verify(hotelService, never()).rate(anyLong(), anyByte());
+        }
 
 }

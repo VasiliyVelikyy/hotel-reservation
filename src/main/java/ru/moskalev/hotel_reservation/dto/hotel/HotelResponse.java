@@ -22,6 +22,15 @@ public record HotelResponse(
         String address,
 
         @Schema(description = "Расстояние в метрах", example = "1500")
-        Integer distance
+        Integer distance,
+
+        @Schema(description = "Текущий рейтинг", example = "5.0")
+        Double rating,
+
+        @Schema(description = "Сумма всех оценок", example = "50")
+        Double totalRating,
+
+        @Schema(description = "Общее количество оценок.", example = "10")
+        Integer numberOfRating
 ) {
 }

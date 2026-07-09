@@ -32,8 +32,13 @@ public class Hotel {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Room> rooms=new ArrayList<>();
+    private List<Room> rooms = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-//    private List<Grade> grades = new ArrayList<>();
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "rating", column = @Column(name = "current_rating")),
+            @AttributeOverride(name = "totalRating", column = @Column(name = "total_rating_sum")),
+            @AttributeOverride(name = "numberOfRating", column = @Column(name = "rating_count"))
+    })
+    private Grade grade;
 }

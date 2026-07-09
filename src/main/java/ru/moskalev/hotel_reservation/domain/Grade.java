@@ -6,24 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+
+@Embeddable
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Grade {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "grade_seq")
-    @SequenceGenerator(name = "grade_seq", sequenceName = "grade_seq", allocationSize = 50)
-    private Long id;
-
-    private Byte mark;
-
-    private String comment;
-
-    private String author;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hotel_id")
-    private Hotel hotel;
+    private Double rating;
+    private Double totalRating;
+    private Integer numberOfRating;
 }

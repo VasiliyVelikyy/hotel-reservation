@@ -1,5 +1,8 @@
 package ru.moskalev.hotel_reservation.integration;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -7,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.moskalev.hotel_reservation.dto.grade.GradeResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
@@ -60,6 +64,13 @@ public class HotelController implements HotelApi {
     @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long hotelId) {
         hotelService.delete(hotelId);
+    }
+
+    @PostMapping(HOTEL_ID + GRADE)
+    @PreAuthorize("isAuthenticated()")
+    public GradeResponse rate(@PathVariable Long hotelId,
+                              @RequestParam @Min(1) @Max(5) @NotNull Byte newMark) {
+       return hotelService.rate(hotelId, newMark);
     }
 
 }

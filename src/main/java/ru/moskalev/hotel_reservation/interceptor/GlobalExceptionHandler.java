@@ -6,9 +6,11 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import ru.moskalev.hotel_reservation.dto.ErrorResponse;
 import ru.moskalev.hotel_reservation.exception.BookingException;
 import ru.moskalev.hotel_reservation.exception.EntityAlreadyExistsException;
@@ -56,12 +58,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequest(ValidationException ex) {
+    //Validation  exception
+    @ExceptionHandler({
+            ValidationException.class,
+            HandlerMethodValidationException.class,
+            MissingServletRequestParameterException.class
+    })
+    public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex) {
         log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                "Validation Failed",
                 ex.getMessage()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

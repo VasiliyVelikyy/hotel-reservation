@@ -68,7 +68,6 @@ Authorization: Basic {{adminLogin}} {{adminPass}}
     client.global.set("bookingId", response.body.id);
     client.log("Бронирование успешно создано. Присвоен ID: " + response.body.id);
 
-    // Проверка статуса
     client.test("Создание бронирования прошло успешно", function() {
         client.assert(response.status === 200 || response.status === 201, "Ожидался статус 200/201, получен " + response.status);
     });
