@@ -3,6 +3,7 @@ package ru.moskalev.hotel_reservation.utils;
 import org.springframework.data.domain.Sort;
 import ru.moskalev.hotel_reservation.exception.PaginatedException;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.function.Consumer;
@@ -35,5 +36,11 @@ public class CommonUtil {
 
     public static long toEpochSecond(LocalDate date) {
         return date.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+    }
+
+    public static LocalDate toLocalDate(long seconds) {
+        return  Instant.ofEpochSecond(seconds)
+                .atZone(ZoneId.of("Europe/Moscow"))
+                .toLocalDate();
     }
 }

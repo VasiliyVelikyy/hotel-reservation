@@ -3,17 +3,20 @@ package ru.moskalev.hotel_reservation.service;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.moskalev.hotel_reservation.domain.Hotel;
 import ru.moskalev.hotel_reservation.dto.grade.GradeResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
+import ru.moskalev.hotel_reservation.dto.hotel.HotelFilter;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelResponse;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelUpdateInput;
 import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 import ru.moskalev.hotel_reservation.mapper.GradeMapper;
 import ru.moskalev.hotel_reservation.mapper.HotelMapper;
 import ru.moskalev.hotel_reservation.repo.HotelRepository;
+import ru.moskalev.hotel_reservation.specification.HotelSpecification;
 
 import static ru.moskalev.hotel_reservation.exception.ErrorMessagesTemplates.HOTEL_NOT_FOUND_TEMPLATE;
 
@@ -63,6 +66,13 @@ public class HotelService {
     @Transactional(readOnly = true)
     public Page<HotelResponse> getAll(Pageable pageable) {
         Page<Hotel> hotelPage = repository.findAll(pageable);
+        return hotelPage.map(hotelMapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HotelResponse> getAllByFilter(HotelFilter filter, Pageable pageable) {
+        Specification<Hotel> spec = HotelSpecification.withFilter(filter);
+        Page<Hotel> hotelPage = repository.findAll(spec, pageable);
         return hotelPage.map(hotelMapper::toResponse);
     }
 

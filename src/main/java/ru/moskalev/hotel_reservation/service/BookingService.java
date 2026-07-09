@@ -1,6 +1,6 @@
 package ru.moskalev.hotel_reservation.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,9 +9,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.moskalev.hotel_reservation.domain.*;
+import ru.moskalev.hotel_reservation.domain.Booking;
+import ru.moskalev.hotel_reservation.domain.CustomUserDetails;
+import ru.moskalev.hotel_reservation.domain.Room;
+import ru.moskalev.hotel_reservation.domain.User;
 import ru.moskalev.hotel_reservation.dto.booking.BookingCreateRequest;
 import ru.moskalev.hotel_reservation.dto.booking.BookingResponse;
+import ru.moskalev.hotel_reservation.dto.kafka.RoomBookedEvent;
 import ru.moskalev.hotel_reservation.exception.BookingException;
 import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 import ru.moskalev.hotel_reservation.mapper.BookingMapper;
@@ -22,16 +26,18 @@ import java.util.Objects;
 
 import static ru.moskalev.hotel_reservation.exception.ErrorMessagesTemplates.*;
 import static ru.moskalev.hotel_reservation.utils.CommonUtil.toEpochSecond;
+import static ru.moskalev.hotel_reservation.utils.CommonUtil.toLocalDate;
 
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class BookingService {
     private final RoomService roomService;
     private final BookingRepository bookingRepository;
     private final UserService userService;
     private final BookingMapper bookingMapper;
+    private final KafkaStatsPublisher kafkaStatsPublisher;
 
     @Transactional
     public BookingResponse create(BookingCreateRequest request) {
@@ -58,12 +64,18 @@ public class BookingService {
                 .getPrincipal();
 
         if (userDetails == null) {
-            throw new EntityNotFoundException(USER_NOT_FOUND_TEMPLATE.formatted("id","some"));
+            throw new EntityNotFoundException(USER_NOT_FOUND_TEMPLATE.formatted("id", "some"));
         }
         User user = userService.getReferenceById(getCurrentUserId());
 
         Booking booking = getBooking(request, user, room, reqStart, reqEnd);
         Booking savedBooking = bookingRepository.save(booking);
+
+        kafkaStatsPublisher.publishBookingEvent(new RoomBookedEvent(
+                getCurrentUserId(),
+                toLocalDate(booking.getStartDate()),
+                toLocalDate(booking.getEndDate())));
+
         return bookingMapper.toResponse(savedBooking);
     }
 

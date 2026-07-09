@@ -1,0 +1,50 @@
+### Переменные окружения
+@host = http://localhost:8090
+@baseUrl = {{host}}/v1/stats
+
+### Переменные для тестов
+@adminLogin = testLogin
+@adminPass = qwertyui
+@clientLogin = clientTestLogin
+@clientPass = qwertyui
+
+### 1. Успешная выгрузка статистики в CSV (GET, роль ADMIN)
+GET {{baseUrl}}/export-csv
+Accept: application/octet-stream
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+> {%
+    // Проверка статуса ответа
+    client.test("Запрос на выгрузку CSV выполнен успешно", function() {
+        client.assert(response.status === 200, "Ожидался статус 200, получен " + response.status);
+    });
+
+    // Проверка заголовков ответа (Content-Type и Content-Disposition)
+    client.test("Заголовки ответа корректны", function() {
+        var contentType = response.headers.valueOf("Content-Type");
+        client.assert(contentType.includes("application/octet-stream"), "Ожидался Content-Type application/octet-stream, получен " + contentType);
+
+        var contentDisposition = response.headers.valueOf("Content-Disposition");
+        client.assert(contentDisposition && contentDisposition.includes("statistics_"), "Ожидалось имя файла statistics_*.csv в Content-Disposition");
+        client.log("Имя сформированного файла: " + contentDisposition);
+    });
+
+    // Проверка наличия данных в теле ответа
+    client.test("Тело ответа содержит данные", function() {
+        client.assert(response.body != null, "Тело ответа не должно быть пустым");
+        client.log("Размер полученного ответа: " + response.body.length + " байт");
+    });
+%}
+
+
+### 2. Попытка выгрузки CSV без прав администратора (GET, роль CLIENT)
+GET {{baseUrl}}/export-csv
+Accept: application/octet-stream
+Authorization: Basic {{clientLogin}} {{clientPass}}
+
+> {%
+    // Проверка, что Spring Security отклонил запрос из-за @PreAuthorize("hasRole('ADMIN')")
+    client.test("Доступ запрещен для пользователя без роли ADMIN", function() {
+        client.assert(response.status === 403 || response.status === 401, "Ожидался статус 403 (Forbidden) или 401 (Unauthorized), получен " + response.status);
+    });
+%}

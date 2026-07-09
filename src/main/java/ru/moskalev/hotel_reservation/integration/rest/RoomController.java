@@ -1,4 +1,4 @@
-package ru.moskalev.hotel_reservation.integration;
+package ru.moskalev.hotel_reservation.integration.rest;
 
 
 import lombok.AllArgsConstructor;
@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.moskalev.hotel_reservation.dto.room.RoomCreateInput;
+import ru.moskalev.hotel_reservation.dto.room.RoomFilter;
 import ru.moskalev.hotel_reservation.dto.room.RoomResponse;
 import ru.moskalev.hotel_reservation.dto.room.RoomUpdateInput;
 import ru.moskalev.hotel_reservation.integration.api.RoomApi;
@@ -49,6 +50,18 @@ public class RoomController implements RoomApi {
         return service.getAllByHotelId(hotelId, pageable);
     }
 
+    @PostMapping(HOTEL + HOTEL_ID + FILTER)
+    @PreAuthorize("isAuthenticated()")
+    public Page<RoomResponse> getAllByHotelIdAndFilter(@PathVariable Long hotelId,
+                                                       @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                                                       @RequestParam(defaultValue = DEFAULT_SIZE) int size,
+                                                       @RequestParam(defaultValue = DEFAULT_SORTED_BY_ID) String sortBy,
+                                                       @RequestParam(defaultValue = DEFAULT_DIRECTION_ASC) String direction,
+                                                       @RequestBody(required = false) RoomFilter filter) {
+        var sort = getSort(sortBy, direction);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return service.getAllByHotelIdAndFilter(hotelId, filter, pageable);
+    }
 
     @PutMapping(ROOM_ID)
     @PreAuthorize("hasRole('ADMIN')")

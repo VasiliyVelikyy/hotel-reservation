@@ -15,6 +15,8 @@ public class Constants {
     public static final String LOGIN = "/login";
     public static final String LOGIN_PATH = "/{login}";
     public static final String OTHER_PATH = "/**";
+    public static final String STATS = "/stats";
+    public static final String EXPORT_CSV ="/export-csv";
 
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_SIZE = "10";

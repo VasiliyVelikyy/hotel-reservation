@@ -50,7 +50,7 @@ Authorization: Basic {{adminLogin}} {{adminPass}}
     client.global.set("roomId", response.body.id);
     client.log("Номер успешно создан. Присвоен ID: " + response.body.id);
 
-    client.test("Создание номера прошло успешно", function() {
+    client.test("Создание номера прошло успешно", function () {
         client.assert(response.status === 201, "Ожидался статус 201, получен " + response.status);
     });
 %}
@@ -61,11 +61,61 @@ Accept: application/json
 Authorization: Basic {{adminLogin}} {{adminPass}}
 
 ### 3. Получение всех номеров конкретного отеля с пагинацией (GET)
-### Путь: /v1/rooms/hotel/{hotelId}
-
 GET {{baseUrl}}/hotel/{{hotelId}}?page=0&size=10&sortBy=price&direction=desc
 Accept: application/json
 Authorization: Basic {{adminLogin}} {{adminPass}}
+
+
+### 3.1. Все комнаты отеля без фильтра
+POST {{baseUrl}}/hotel/{{hotelId}}/filter?page=0&size=10&sortBy=id&direction=asc
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+### 3.2. Фильтр по цене (от 1000 до 5000)
+POST{{baseUrl}}/hotel/{{hotelId}}/filter?page=0&size=10&sortBy=price&direction=asc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "minPrice": 1000,
+  "maxPrice": 50000
+}
+
+### 3.3. Фильтр по вместимости (минимум 2 гостя)
+POST {{baseUrl}}/hotel/{{hotelId}}/filter?page=0&size=10&sortBy=id&direction=asc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "minGuestCount": 2
+}
+
+### 3.4. Поиск свободных комнат на даты (10 июля - 15 июля 2026)
+POST {{baseUrl}}/hotel/{{hotelId}}/filter?page=0&size=10&sortBy=id&direction=asc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "startDate": 1752105600000,
+  "endDate": 1752537600000
+}
+
+### 3.5. Комбинированный фильтр (цена + вместимость + свободные даты)
+POST {{baseUrl}}/hotel/{{hotelId}}/filter?page=0&size=10&sortBy=price&direction=asc
+Content-Type: application/json
+Accept: application/json
+Authorization: Basic {{adminLogin}} {{adminPass}}
+
+{
+  "minPrice": 2000,
+  "maxPrice": 100000,
+  "minGuestCount": 2,
+  "startDate": 1752105600000,
+  "endDate": 1752537600000
+}
 
 ### 4. Обновление номера (PUT)
 PUT {{baseUrl}}/{{roomId}}
@@ -91,3 +141,4 @@ Authorization: Basic {{adminLogin}} {{adminPass}}
 GET {{baseUrl}}/{{roomId}}
 Accept: application/json
 Authorization: Basic {{adminLogin}} {{adminPass}}
+

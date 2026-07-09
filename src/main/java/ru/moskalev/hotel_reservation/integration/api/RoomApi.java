@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.moskalev.hotel_reservation.dto.ErrorResponse;
 import ru.moskalev.hotel_reservation.dto.room.RoomCreateInput;
+import ru.moskalev.hotel_reservation.dto.room.RoomFilter;
 import ru.moskalev.hotel_reservation.dto.room.RoomResponse;
 import ru.moskalev.hotel_reservation.dto.room.RoomUpdateInput;
 
@@ -99,14 +100,34 @@ public interface RoomApi {
                                                in = ParameterIn.PATH
                                        )
                                        @PathVariable Long hotelId,
-                                       @Parameter(description = "Номер страницы (начинается с 0)")
-                                       int page,
-                                       @Parameter(description = "Размер страницы")
-                                       int size,
-                                       @Parameter(description = "Поле для сортировки")
-                                       String sortBy,
-                                       @Parameter(description = "Направление сортировки (asc/desc)")
-                                       String direction);
+                                       @Parameter(description = "Номер страницы", example = "0") int page,
+                                       @Parameter(description = "Размер страницы", example = "10") int size,
+                                       @Parameter(description = "Поле сортировки", example = "id") String sortBy,
+                                       @Parameter(description = "Направление сортировки", example = "asc") String direction);
+
+
+    @Operation(
+            summary = "Получить комнаты отеля с фильтрацией",
+            description = "Возвращает страницу комнат указанного отеля с возможностью фильтрации. " +
+                    "Если указаны даты заезда и выезда — возвращаются только свободные комнаты."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Комнаты успешно найдены"),
+            @ApiResponse(responseCode = "400", description = "Невалидные параметры"),
+            @ApiResponse(responseCode = "401", description = "Пользователь не авторизован"),
+            @ApiResponse(responseCode = "404", description = "Отель не найден")
+    })
+    Page<RoomResponse> getAllByHotelIdAndFilter(
+            @Parameter(description = "ID отеля", example = "1")
+            @PathVariable Long hotelId,
+            @Parameter(description = "Номер страницы", example = "0") int page,
+            @Parameter(description = "Размер страницы", example = "10") int size,
+            @Parameter(description = "Поле сортировки", example = "id") String sortBy,
+            @Parameter(description = "Направление сортировки", example = "asc") String direction,
+            @RequestBody(description = "Фильтр комнат. Все поля опциональны. " +
+                    "Если указаны startDate и endDate — возвращаются только свободные комнаты.")
+            @Valid RoomFilter filter
+    );
 
     @Operation(
             summary = "Обновить номер",

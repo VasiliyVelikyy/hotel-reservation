@@ -2,6 +2,7 @@ package ru.moskalev.hotel_reservation.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Formula;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,4 +42,8 @@ public class Hotel {
             @AttributeOverride(name = "numberOfRating", column = @Column(name = "rating_count"))
     })
     private Grade grade;
+
+    @Formula("current_rating")
+    private Double rating;
+
 }
