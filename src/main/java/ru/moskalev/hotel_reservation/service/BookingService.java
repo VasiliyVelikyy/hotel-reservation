@@ -18,6 +18,7 @@ import ru.moskalev.hotel_reservation.dto.booking.BookingResponse;
 import ru.moskalev.hotel_reservation.dto.kafka.RoomBookedEvent;
 import ru.moskalev.hotel_reservation.exception.BookingException;
 import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
+import ru.moskalev.hotel_reservation.integration.kafka.KafkaStatsPublisher;
 import ru.moskalev.hotel_reservation.mapper.BookingMapper;
 import ru.moskalev.hotel_reservation.repo.BookingRepository;
 

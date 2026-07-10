@@ -483,16 +483,21 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
 
 
     private Room buildRoom(Long hotelId, String name) {
+        Room room = getRoom(name);
+
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new EntityNotFoundException("Hotel not found"));
+        room.setHotel(hotel);
+        return room;
+    }
+
+    public static Room getRoom(String name) {
         Room room = new Room();
         room.setName(name);
         room.setDescription("Description");
         room.setNumber((short) 100);
         room.setPrice(new BigDecimal("1000.00"));
         room.setMaxCount((byte) 2);
-
-        Hotel hotel = hotelRepository.findById(hotelId)
-                .orElseThrow(() -> new EntityNotFoundException("Hotel not found"));
-        room.setHotel(hotel);
         return room;
     }
 
@@ -507,7 +512,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         return room;
     }
 
-    private User buildUser(String login, String email, String hashPassword, UserRole role) {
+    public static User buildUser(String login, String email, String hashPassword, UserRole role) {
         User user = new User();
         user.setLogin(login);
         user.setEmail(email);
@@ -516,7 +521,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         return user;
     }
 
-    private User buildUser(String login) {
+    public static User buildUser(String login) {
         return buildUser(login, login + "@test.com", "hashedPassword123", UserRole.CLIENT);
     }
 }

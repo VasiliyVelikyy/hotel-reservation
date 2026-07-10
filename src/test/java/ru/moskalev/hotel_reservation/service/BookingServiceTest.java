@@ -365,7 +365,7 @@ class BookingServiceTest extends BaseIntegrationTest {
     /**
      * Вспомогательный метод для установки аутентификации в тестах
      */
-    private void setAuthentication(Long userId, String username) {
+    public static void setAuthentication(Long userId, String username) {
         CustomUserDetails userDetails = new CustomUserDetails(
                 userId,
                 username,
