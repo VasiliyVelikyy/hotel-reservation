@@ -11,6 +11,7 @@ import ru.moskalev.hotel_reservation.dto.user.UserResponse;
 import ru.moskalev.hotel_reservation.dto.user.UserUpdateInput;
 import ru.moskalev.hotel_reservation.exception.EntityAlreadyExistsException;
 import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
+import ru.moskalev.hotel_reservation.integration.kafka.KafkaStatsPublisher;
 import ru.moskalev.hotel_reservation.mapper.UserMapper;
 import ru.moskalev.hotel_reservation.repo.UserRepository;
 

@@ -35,3 +35,7 @@ CREATE SCHEMA IF NOT EXISTS hotel_reservation
 ```
 
 
+```shell
+docker exec -it kafka rpk group seek hotel-reservation-group --to start --topics user-registration-topic --topics room-booking-topic --allow-new-topics
+
+```

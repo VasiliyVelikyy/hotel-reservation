@@ -27,7 +27,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
     implementation ("org.springframework.boot:spring-boot-starter-security")
     implementation ("org.bouncycastle:bcprov-jdk18on:1.78.1")
-    implementation("org.springframework.kafka:spring-kafka")
+    implementation("org.springframework.boot:spring-boot-starter-kafka")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("com.opencsv:opencsv:5.7.1")
 
@@ -43,7 +43,10 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:1.20.4")
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("org.testcontainers:postgresql:1.20.4")
+    testImplementation("org.testcontainers:kafka:1.20.4")
+    testImplementation("org.testcontainers:mongodb:1.20.4")
     testImplementation("org.springframework.security:spring-security-test")
+
 
 	testCompileOnly("org.projectlombok:lombok")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")

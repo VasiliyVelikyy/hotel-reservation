@@ -13,7 +13,7 @@ public record UserCreateInput(
 
         @Schema(description = "Электронная почта", example = "test@mail.dev")
         @NotBlank(message = "Email не может быть пустым")
-        @Size(max = 100, message = "Email не может превышать 100 символов") // ✅ Исправлено с @Max
+        @Size(max = 100, message = "Email не может превышать 100 символов")
         @Email(message = "Некорректный формат email")
         String email,
 
