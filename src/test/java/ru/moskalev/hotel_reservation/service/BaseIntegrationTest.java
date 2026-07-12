@@ -28,7 +28,7 @@ public abstract class BaseIntegrationTest {
                     .withReuse(true);
 
     protected static final KafkaContainer kafka =
-            new KafkaContainer(DockerImageName.parse(   "apache/kafka:3.8.0"))
+            new KafkaContainer(DockerImageName.parse("apache/kafka:3.8.0"))
                     .withReuse(true);
 
 
@@ -39,7 +39,6 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.datasource.password", postgres::getPassword);
 
         registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
-
 
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("spring.kafka.consumer.group-id", () -> TEST_KAFKA_GROUP_ID);
