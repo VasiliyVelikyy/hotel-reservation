@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import ru.moskalev.hotel_reservation.service.CsvExportService;
 
 import java.time.LocalDate;
@@ -22,19 +23,17 @@ public class StatsController {
 
     @GetMapping(EXPORT_CSV)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<byte[]> downloadStatsCsv() {
-        byte[] csvData = csvExportService.generateStatCsv();
-        HttpHeaders headers = getHeaders();
+    public ResponseEntity<StreamingResponseBody> exportCsv() {
+        StreamingResponseBody responseBody = csvExportService::generateStatCsv;
 
         return ResponseEntity.ok()
-                .headers(headers)
-                .body(csvData);
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        getAttachment())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(responseBody);
     }
 
-    private static HttpHeaders getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", "statistics_" + LocalDate.now() + ".csv");
-        return headers;
+    private static String getAttachment() {
+        return "attachment; filename=statistics_" + LocalDate.now() + ".csv";
     }
 }

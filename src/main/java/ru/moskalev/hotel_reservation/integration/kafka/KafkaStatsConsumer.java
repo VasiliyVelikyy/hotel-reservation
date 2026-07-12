@@ -11,7 +11,7 @@ import ru.moskalev.hotel_reservation.service.StatsService;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class StatsKafkaConsumer {
+public class KafkaStatsConsumer {
     private final StatsService statsService;
 
     @KafkaListener(

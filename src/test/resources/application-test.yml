@@ -5,6 +5,14 @@ spring:
     password: dummy
     hikari:
       maximum-pool-size: 2
+  kafka:
+    topics:
+      user: user-registration-topic
+      booking: room-booking-topic
+
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
 
   liquibase:
     enabled: true

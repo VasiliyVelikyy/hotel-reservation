@@ -8,7 +8,7 @@ import ru.moskalev.hotel_reservation.dto.kafka.UserRegisteredEvent;
 import ru.moskalev.hotel_reservation.repo.StatEventRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -35,7 +35,7 @@ public class StatsService {
         repository.save(doc);
     }
 
-    public List<StatEventDocument> findAll() {
-        return repository.findAll();
+    public Stream<StatEventDocument> findAll() {
+        return repository.findAllBy();
     }
 }
