@@ -32,7 +32,8 @@ class CommonUtilTest {
         assertThat(result).isNotNull();
         assertThat(result.isSorted()).isTrue();
         assertThat(result.getOrderFor("name")).isNotNull();
-        assertThat(result.getOrderFor("name").getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(Objects.requireNonNull(result.getOrderFor("name"))
+                .getDirection()).isEqualTo(Sort.Direction.ASC);
     }
 
     @Test
@@ -47,7 +48,8 @@ class CommonUtilTest {
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.getOrderFor("id").getDirection()).isEqualTo(Sort.Direction.ASC);
+        assertThat(Objects.requireNonNull(result.getOrderFor("id")).getDirection())
+                .isEqualTo(Sort.Direction.ASC);
     }
 
     @Test
@@ -64,7 +66,8 @@ class CommonUtilTest {
         assertThat(result).isNotNull();
         assertThat(result.isSorted()).isTrue();
         assertThat(result.getOrderFor("price")).isNotNull();
-        assertThat(result.getOrderFor("price").getDirection()).isEqualTo(Sort.Direction.DESC);
+        assertThat(Objects.requireNonNull(result.getOrderFor("price"))
+                .getDirection()).isEqualTo(Sort.Direction.DESC);
     }
 
     @Test
@@ -79,7 +82,8 @@ class CommonUtilTest {
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.getOrderFor("createdAt").getDirection()).isEqualTo(Sort.Direction.DESC);
+        assertThat(Objects.requireNonNull(result.getOrderFor("createdAt"))
+                .getDirection()).isEqualTo(Sort.Direction.DESC);
     }
 
     @Test
@@ -162,8 +166,9 @@ class CommonUtilTest {
         // when
         CommonUtil.updateIfNotNull("test", setter);
 
+        var actual = sb.toString();
         // then
-        assertThat(sb.toString()).isEqualTo("test");
+        assertThat(actual).isEqualTo("test");
     }
 
     @Test

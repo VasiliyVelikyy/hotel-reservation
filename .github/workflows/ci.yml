@@ -10,7 +10,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,12 +25,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew build -x test
-
-      - name: Run tests
-        run: ./gradlew test
-        # Testcontainers сам поднимет PostgreSQL, MongoDB и Kafka
+      - name: Build and Run Tests
+        run: ./gradlew clean test
+        # Testcontainers сам поднимет Postgres, Mongo и Kafka внутри этого шага
 
       - name: Upload test results
         if: always()

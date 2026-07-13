@@ -1,6 +1,7 @@
 package ru.moskalev.hotel_reservation.integration.rest;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,10 +45,10 @@ public class BookingController implements BookingApi {
 
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<BookingResponse> getAllBookings(@RequestParam(defaultValue = DEFAULT_PAGE) int page,
-                                                @RequestParam(defaultValue = DEFAULT_SIZE) int size,
-                                                @RequestParam(defaultValue = DEFAULT_SORTED_BY_ID) String sortBy,
-                                                @RequestParam(defaultValue = DEFAULT_DIRECTION_ASC) String direction) {
+    public Page<@NonNull BookingResponse> getAllBookings(@RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                                                         @RequestParam(defaultValue = DEFAULT_SIZE) int size,
+                                                         @RequestParam(defaultValue = DEFAULT_SORTED_BY_ID) String sortBy,
+                                                         @RequestParam(defaultValue = DEFAULT_DIRECTION_ASC) String direction) {
         var sort = getSort(sortBy, direction);
         Pageable pageable = PageRequest.of(page, size, sort);
         return bookingService.getAllBookings(pageable);

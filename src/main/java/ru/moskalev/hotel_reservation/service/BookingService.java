@@ -2,6 +2,7 @@ package ru.moskalev.hotel_reservation.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -100,8 +101,8 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public Page<BookingResponse> getAllBookings(Pageable pageable) {
-        Page<Booking> bookingsPage = bookingRepository.findAll(pageable);
+    public Page<@NonNull BookingResponse> getAllBookings(Pageable pageable) {
+        var bookingsPage = bookingRepository.findAll(pageable);
         return bookingsPage.map(bookingMapper::toResponse);
     }
 

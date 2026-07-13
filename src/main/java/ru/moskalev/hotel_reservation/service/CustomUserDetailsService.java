@@ -1,6 +1,7 @@
 package ru.moskalev.hotel_reservation.service;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +18,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserService userService;
 
     @Override
-    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+
+    public @NonNull UserDetails loadUserByUsername(@NonNull String login) throws UsernameNotFoundException {
         User user = userService.findUserByLogin(login);
 
         return new CustomUserDetails(

@@ -36,11 +36,9 @@ public class Hotel {
     private List<Room> rooms = new ArrayList<>();
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "rating", column = @Column(name = "current_rating")),
-            @AttributeOverride(name = "totalRating", column = @Column(name = "total_rating_sum")),
-            @AttributeOverride(name = "numberOfRating", column = @Column(name = "rating_count"))
-    })
+    @AttributeOverride(name = "rating", column = @Column(name = "current_rating"))
+    @AttributeOverride(name = "totalRating", column = @Column(name = "total_rating_sum"))
+    @AttributeOverride(name = "numberOfRating", column = @Column(name = "rating_count"))
     private Grade grade;
 
     @Formula("current_rating")

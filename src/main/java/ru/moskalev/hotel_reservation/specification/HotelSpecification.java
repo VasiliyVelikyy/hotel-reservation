@@ -1,6 +1,9 @@
 package ru.moskalev.hotel_reservation.specification;
 
 import jakarta.persistence.criteria.Predicate;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
 import ru.moskalev.hotel_reservation.domain.Hotel;
 import ru.moskalev.hotel_reservation.dto.hotel.HotelFilter;
@@ -8,9 +11,10 @@ import ru.moskalev.hotel_reservation.dto.hotel.HotelFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HotelSpecification {
 
-    public static Specification<Hotel> withFilter(HotelFilter filter) {
+    public static Specification<@NonNull Hotel> withFilter(HotelFilter filter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 

@@ -17,8 +17,8 @@ spring:
         spring.json.trusted.packages: ru.moskalev.hotel_reservation.dto.kafka
 
     topics:
-      user: user-registration-topic
-      booking: room-booking-topic
+      user: user-registration
+      booking: room-booking
   application:
     name: hotel-reservation
   datasource:

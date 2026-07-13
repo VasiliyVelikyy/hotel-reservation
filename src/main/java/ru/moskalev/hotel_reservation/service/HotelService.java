@@ -1,9 +1,9 @@
 package ru.moskalev.hotel_reservation.service;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.moskalev.hotel_reservation.domain.Hotel;
@@ -46,8 +46,8 @@ public class HotelService {
 
     @Transactional(readOnly = true)
     public void checkExistHotel(Long id) {
-        if(!repository.existsById(id)){
-            throw new  EntityNotFoundException(HOTEL_NOT_FOUND_TEMPLATE.formatted(id));
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException(HOTEL_NOT_FOUND_TEMPLATE.formatted(id));
         }
     }
 
@@ -64,15 +64,15 @@ public class HotelService {
     }
 
     @Transactional(readOnly = true)
-    public Page<HotelResponse> getAll(Pageable pageable) {
-        Page<Hotel> hotelPage = repository.findAll(pageable);
+    public Page<@NonNull HotelResponse> getAll(Pageable pageable) {
+        var hotelPage = repository.findAll(pageable);
         return hotelPage.map(hotelMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public Page<HotelResponse> getAllByFilter(HotelFilter filter, Pageable pageable) {
-        Specification<Hotel> spec = HotelSpecification.withFilter(filter);
-        Page<Hotel> hotelPage = repository.findAll(spec, pageable);
+    public Page<@NonNull HotelResponse> getAllByFilter(HotelFilter filter, Pageable pageable) {
+        var spec = HotelSpecification.withFilter(filter);
+        var hotelPage = repository.findAll(spec, pageable);
         return hotelPage.map(hotelMapper::toResponse);
     }
 

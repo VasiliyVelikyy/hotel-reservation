@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.fail;
+import static ru.moskalev.hotel_reservation.utils.TestUtils.containsRow;
 
 @SpringBootTest
 class CsvExportServiceIntegrationTest extends BaseIntegrationTest {
@@ -55,9 +56,9 @@ class CsvExportServiceIntegrationTest extends BaseIntegrationTest {
         statEventRepository.saveAll(List.of(userEvent, bookingEvent));
 
         // when
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        csvExportService.generateStatCsv(baos);
-        String csvContent = baos.toString(StandardCharsets.UTF_8);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        csvExportService.generateStatCsv(stream);
+        String csvContent = stream.toString(StandardCharsets.UTF_8);
 
         // then
         try (CSVReader reader = new CSVReader(new StringReader(csvContent))) {
@@ -85,16 +86,16 @@ class CsvExportServiceIntegrationTest extends BaseIntegrationTest {
                     .isTrue();
 
         } catch (Exception e) {
-            fail("Не удалось распарсить сгенерированный CSV", e);
+            fail("Не удалось обработать сгенерированный CSV", e);
         }
     }
 
     @Test
     void shouldGenerateOnlyHeadersWhenDatabaseIsEmpty() {
         // when
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        csvExportService.generateStatCsv(baos);
-        String csvContent = baos.toString(StandardCharsets.UTF_8);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        csvExportService.generateStatCsv(stream);
+        String csvContent = stream.toString(StandardCharsets.UTF_8);
 
         // then
         try (CSVReader reader = new CSVReader(new StringReader(csvContent))) {
@@ -109,7 +110,7 @@ class CsvExportServiceIntegrationTest extends BaseIntegrationTest {
                     CsvExportService.CREATED_AT_COLUMN
             );
         } catch (Exception e) {
-            fail("Не удалось распарсить сгенерированный CSV", e);
+            fail("Не удалось обработать сгенерированный CSV", e);
         }
     }
 
@@ -133,9 +134,9 @@ class CsvExportServiceIntegrationTest extends BaseIntegrationTest {
         statEventRepository.saveAll(events);
 
         // when
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        csvExportService.generateStatCsv(baos);
-        String csvContent = baos.toString(StandardCharsets.UTF_8);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        csvExportService.generateStatCsv(stream);
+        String csvContent = stream.toString(StandardCharsets.UTF_8);
 
         // then
         try (CSVReader reader = new CSVReader(new StringReader(csvContent))) {
@@ -151,17 +152,8 @@ class CsvExportServiceIntegrationTest extends BaseIntegrationTest {
 
             Assertions.assertThat(distinctUserIds).isEqualTo(1000);
         } catch (Exception e) {
-            fail("Не удалось распарсить сгенерированный CSV", e);
+            fail("Не удалось обработать сгенерированный CSV", e);
         }
     }
 
-    private boolean containsRow(List<String[]> rows, String eventType, String userId, String checkIn, String checkOut) {
-        return rows.stream().skip(1) // Пропускаем заголовок
-                .anyMatch(row ->
-                        row[0].equals(eventType) &&
-                                row[1].equals(userId) &&
-                                row[2].equals(checkIn) &&
-                                row[3].equals(checkOut)
-                );
-    }
 }

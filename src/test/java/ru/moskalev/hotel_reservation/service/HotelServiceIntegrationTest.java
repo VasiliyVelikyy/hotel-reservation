@@ -1,12 +1,12 @@
 package ru.moskalev.hotel_reservation.service;
 
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,6 +24,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.moskalev.hotel_reservation.TestConstants.*;
+import static ru.moskalev.hotel_reservation.utils.TestUtils.buildHotel;
+import static ru.moskalev.hotel_reservation.utils.TestUtils.getHotelCreateInput;
 
 @DisplayName("HotelService")
 class HotelServiceIntegrationTest extends BaseIntegrationTest {
@@ -67,23 +70,24 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
     @DisplayName("create: должен корректно обработать null в опциональных полях")
     void create_shouldHandleNullOptionalFields() {
         // given
+        int distance = 1;
         HotelCreateInput input = new HotelCreateInput(
-                "Simple Hotel",
+                HOSTEL_NAME,
                 null,
                 null,
                 "SPB",
-                "ul Pushkina",
-                0
+                ADDRESS,
+                distance
         );
 
         // when
         HotelResponse response = hotelService.create(input);
 
         // then
-        assertThat(response.name()).isEqualTo("Simple Hotel");
+        assertThat(response.name()).isEqualTo(HOSTEL_NAME);
         assertThat(response.description()).isNull();
         assertThat(response.title()).isNull();
-        assertThat(response.distance()).isZero();
+        assertThat(response.distance()).isEqualTo(distance);
         assertThat(response.rating()).isZero();
         assertThat(response.totalRating()).isZero();
         assertThat(response.numberOfRating()).isZero();
@@ -151,7 +155,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
     void update_shouldNotOverwriteWithNull() {
         // given
         Hotel saved = buildHotel("Original");
-        saved.setTitle("Original Title");
+        saved.setTitle(TITLE);
         saved.setCity("Original City");
         hotelRepository.save(saved);
 
@@ -217,7 +221,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 2);
 
         // when
-        Page<HotelResponse> result = hotelService.getAll(pageable);
+        var result = hotelService.getAll(pageable);
 
         // then
         assertThat(result.getContent()).hasSize(2);
@@ -242,7 +246,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("name").ascending());
 
         // when
-        Page<HotelResponse> result = hotelService.getAll(pageable);
+        var result = hotelService.getAll(pageable);
 
         // then
         assertThat(result.getContent())
@@ -259,7 +263,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(5, 10);
 
         // when
-        Page<HotelResponse> result = hotelService.getAll(pageable);
+        var result = hotelService.getAll(pageable);
 
         // then
         assertThat(result.getContent()).isEmpty();
@@ -279,7 +283,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(1, 2);
 
         // when
-        Page<HotelResponse> result = hotelService.getAll(pageable);
+        var result = hotelService.getAll(pageable);
 
         // then
         assertThat(result.getContent()).hasSize(2);
@@ -306,22 +310,28 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         assertThat(response.numberOfRating()).isEqualTo(1);
     }
 
-    @Test
-    @DisplayName("rate: должен корректно вычислять средний рейтинг при нескольких оценках")
-    void rate_shouldCalculateAverageRatingCorrectly() {
+    @ParameterizedTest
+    @CsvSource({
+            "1, 1.0, 1.0, 1",
+            "3, 3.0, 3.0, 1",
+            "5, 5.0, 5.0, 1"
+    })
+    @DisplayName("rate: должен корректно сохранять оценку")
+    void rate_shouldSaveRatingCorrectly(byte rating,
+                                        double expectedRating,
+                                        double expectedTotal,
+                                        int expectedCount) {
         // given
         HotelCreateInput input = getHotelCreateInput();
         HotelResponse hotel = hotelService.create(input);
 
         // when
-        hotelService.rate(hotel.id(), (byte) 5);
-        hotelService.rate(hotel.id(), (byte) 4);
-        GradeResponse response = hotelService.rate(hotel.id(), (byte) 3);
+        GradeResponse response = hotelService.rate(hotel.id(), rating);
 
         // then
-        assertThat(response.rating()).isEqualTo(4.0);
-        assertThat(response.totalRating()).isEqualTo(12.0);
-        assertThat(response.numberOfRating()).isEqualTo(3);
+        assertThat(response.rating()).isEqualTo(expectedRating);
+        assertThat(response.totalRating()).isEqualTo(expectedTotal);
+        assertThat(response.numberOfRating()).isEqualTo(expectedCount);
     }
 
     @Test
@@ -391,16 +401,6 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         assertThat(savedHotel.getGrade().getNumberOfRating()).isEqualTo(5);
     }
 
-    private static @NotNull HotelCreateInput getHotelCreateInput() {
-        return new HotelCreateInput(
-                "Accumulation Hotel",
-                "Описание",
-                "Заголовок",
-                "Новосибирск",
-                "Ул. Накопительная",
-                1200
-        );
-    }
 
     @Test
     @DisplayName("rate: должен корректно округлять вверх при .5 и более")
@@ -437,7 +437,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id"));
 
         // when
-        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+        var result = hotelService.getAllByFilter(filter, pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -462,7 +462,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+        var result = hotelService.getAllByFilter(filter, pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -488,7 +488,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+        var result = hotelService.getAllByFilter(filter, pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -514,7 +514,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+        var result = hotelService.getAllByFilter(filter, pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -540,7 +540,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+        var result = hotelService.getAllByFilter(filter, pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -566,13 +566,13 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+        var result = hotelService.getAllByFilter(filter, pageable);
 
         // then
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).name()).isEqualTo("Hotel Medium");
-        assertThat(result.getContent().get(0).distance()).isEqualTo(500);
+        assertThat(result.getContent().getFirst().name()).isEqualTo("Hotel Medium");
+        assertThat(result.getContent().getFirst().distance()).isEqualTo(500);
     }
 
     @Test
@@ -592,7 +592,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+        var result = hotelService.getAllByFilter(filter, pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -626,15 +626,15 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+        var result = hotelService.getAllByFilter(filter, pageable);
 
         // then
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).name()).isEqualTo("Grand Hotel Moscow");
-        assertThat(result.getContent().get(0).city()).isEqualTo("Moscow");
-        assertThat(result.getContent().get(0).distance()).isEqualTo(500);
-        assertThat(result.getContent().get(0).rating()).isEqualTo(4.5);
+        assertThat(result.getContent().getFirst().name()).isEqualTo("Grand Hotel Moscow");
+        assertThat(result.getContent().getFirst().city()).isEqualTo("Moscow");
+        assertThat(result.getContent().getFirst().distance()).isEqualTo(500);
+        assertThat(result.getContent().getFirst().rating()).isEqualTo(4.5);
     }
 
     @Test
@@ -651,7 +651,7 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 5);
 
         // when
-        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+        var result = hotelService.getAllByFilter(filter, pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -676,25 +676,11 @@ class HotelServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<HotelResponse> result = hotelService.getAllByFilter(filter, pageable);
+        var result = hotelService.getAllByFilter(filter, pageable);
 
         // then
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isZero();
         assertThat(result.getContent()).isEmpty();
-    }
-
-
-
-    public static Hotel buildHotel(String name) {
-        Hotel hotel = new Hotel();
-        hotel.setName(name);
-        hotel.setDescription("Description");
-        hotel.setTitle("Title");
-        hotel.setCity("City");
-        hotel.setAddress("Ul Pushkina");
-        hotel.setDistance(100);
-        hotel.setGrade(new Grade(0D,0D,0));
-        return hotel;
     }
 }

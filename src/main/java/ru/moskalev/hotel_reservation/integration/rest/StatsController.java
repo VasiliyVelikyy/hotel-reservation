@@ -1,6 +1,7 @@
 package ru.moskalev.hotel_reservation.integration.rest;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class StatsController {
 
     @GetMapping(EXPORT_CSV)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<StreamingResponseBody> exportCsv() {
+    public ResponseEntity<@NonNull StreamingResponseBody> exportCsv() {
         StreamingResponseBody responseBody = csvExportService::generateStatCsv;
 
         return ResponseEntity.ok()

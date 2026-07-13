@@ -9,6 +9,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.Duration;
 import java.util.UUID;
 
 @SpringBootTest
@@ -16,6 +17,7 @@ public abstract class BaseIntegrationTest {
 
     private static final String TEST_KAFKA_GROUP_ID = "test-group-" + UUID.randomUUID();
 
+    @SuppressWarnings("resource")
     protected static final PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:16-alpine")
                     .withReuse(true)
@@ -25,7 +27,7 @@ public abstract class BaseIntegrationTest {
 
     protected static final MongoDBContainer mongo =
             new MongoDBContainer("mongo:7.0")
-                    .withReuse(true);
+                    .withStartupTimeout(Duration.ofSeconds(120));
 
     protected static final KafkaContainer kafka =
             new KafkaContainer(DockerImageName.parse("apache/kafka:3.8.0"))
@@ -39,6 +41,7 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.datasource.password", postgres::getPassword);
 
         registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
+        registry.add("spring.data.mongodb.authentication-database", () -> "admin");
 
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("spring.kafka.consumer.group-id", () -> TEST_KAFKA_GROUP_ID);

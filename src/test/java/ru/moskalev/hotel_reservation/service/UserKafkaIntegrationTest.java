@@ -23,9 +23,7 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static ru.moskalev.hotel_reservation.TestConstants.ADDRESS;
-import static ru.moskalev.hotel_reservation.service.BookingServiceTest.setAuthentication;
-import static ru.moskalev.hotel_reservation.service.RoomServiceIntegrationTest.buildUser;
-import static ru.moskalev.hotel_reservation.service.RoomServiceIntegrationTest.getRoom;
+import static ru.moskalev.hotel_reservation.utils.TestUtils.*;
 
 class UserKafkaIntegrationTest extends BaseIntegrationTest {
     @Autowired
@@ -79,12 +77,12 @@ class UserKafkaIntegrationTest extends BaseIntegrationTest {
     @Test
     void shouldCreateBookingPublishEventAndConsumeToMongo() {
         User user = userRepository.save(buildUser("testUser"));
-        setAuthentication(user.getId(), "testuser");
+        setAuthentication(user.getId(), "test_user");
 
         Long hotelId = hotelService.create(new HotelCreateInput(
-                        "Hotel", null, null, "City", ADDRESS, 0))
+                        "Hotel", null, null, "City", ADDRESS, 1))
                 .id();
-        var savedRoom = roomRepository.save(buildRoom(hotelId, "Room 1"));
+        var savedRoom = roomRepository.save(buildRoom(hotelId));
 
         BookingCreateRequest request = new BookingCreateRequest(
                 savedRoom.getId(),
@@ -99,13 +97,11 @@ class UserKafkaIntegrationTest extends BaseIntegrationTest {
         // then
         await()
                 .atMost(10, TimeUnit.SECONDS)
-                .untilAsserted(() -> {
-                    assertThat(statEventRepository.findAll()).hasSize(1);
-                });
+                .untilAsserted(() -> assertThat(statEventRepository.findAll()).hasSize(1));
     }
 
-    private Room buildRoom(Long hotelId, String name) {
-        Room room = getRoom(name);
+    private Room buildRoom(Long hotelId) {
+        Room room = getRoom("Room 1");
 
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new EntityNotFoundException("Hotel not found"));

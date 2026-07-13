@@ -3,13 +3,13 @@ package ru.moskalev.hotel_reservation.interceptor;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import ru.moskalev.hotel_reservation.dto.ErrorResponse;
 import ru.moskalev.hotel_reservation.exception.BookingException;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex) {
+    public ResponseEntity<@NonNull ErrorResponse> handleEntityNotFound(EntityNotFoundException ex) {
         log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
             EntityAlreadyExistsException.class,
             BookingException.class
     })
-    public ResponseEntity<ErrorResponse> handleEntityAlreadyExists(RuntimeException ex) {
+    public ResponseEntity<@NonNull ErrorResponse> handleEntityAlreadyExists(RuntimeException ex) {
         log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
+    public ResponseEntity<@NonNull ErrorResponse> handleBadRequest(BadRequestException ex) {
         log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
             HandlerMethodValidationException.class,
             MissingServletRequestParameterException.class
     })
-    public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex) {
+    public ResponseEntity<@NonNull ErrorResponse> handleBadRequest(Exception ex) {
         log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
@@ -76,7 +76,7 @@ public class GlobalExceptionHandler {
 
     //Validation  exception
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<@NonNull ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         log.error(ex.getMessage(), ex);
         String errors = ex.getBindingResult()
                 .getFieldErrors()
@@ -93,7 +93,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
+    public ResponseEntity<@NonNull ErrorResponse> handleGlobalException(Exception ex) {
         log.error(ex.getMessage(), ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
