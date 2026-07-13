@@ -27,7 +27,7 @@ public abstract class BaseIntegrationTest {
 
     protected static final MongoDBContainer mongo =
             new MongoDBContainer("mongo:7.0")
-                    .withStartupTimeout(Duration.ofSeconds(120));
+                    .withStartupTimeout(Duration.ofSeconds(300));
 
     protected static final KafkaContainer kafka =
             new KafkaContainer(DockerImageName.parse("apache/kafka:3.8.0"))

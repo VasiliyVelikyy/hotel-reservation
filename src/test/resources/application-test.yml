@@ -1,4 +1,8 @@
 spring:
+  mongodb:
+    uri: mongodb://this-is-a-fake-host-to-prevent-local-connections:27017/test_db
+    authentication-database: admin
+
   datasource:
     url: dummy
     username: dummy

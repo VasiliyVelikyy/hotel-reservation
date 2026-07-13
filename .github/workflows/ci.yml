@@ -28,6 +28,10 @@ jobs:
       - name: Build and Run Tests
         run: ./gradlew clean test
         # Testcontainers сам поднимет Postgres, Mongo и Kafka внутри этого шага
+        env:
+          TESTCONTAINERS_RYUK_DISABLED: true
+          TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: /var/run/docker.sock
+          TESTCONTAINERS_CHECKS_DISABLE: false
 
       - name: Upload test results
         if: always()
