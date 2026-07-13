@@ -40,8 +40,8 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
 
-        registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
-        registry.add("spring.data.mongodb.authentication-database", () -> "admin");
+        registry.add("spring.mongodb.uri", mongo::getReplicaSetUrl);
+        registry.add("spring.mongodb.authentication-database", () -> "admin");
 
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("spring.kafka.consumer.group-id", () -> TEST_KAFKA_GROUP_ID);
