@@ -259,8 +259,7 @@ http/
 
 
 ## STATUS DEBUG
-[![CI Pipeline](https://github.com/VasiliyVelikyy/hotel-reservation/actions/workflows/ci.yml/badge.svg)](https://github.com/VasiliyVelikyy/hotel-reservation/actions/workflows/ci.yml)
-
+[![CI Pipeline](https://github.com/VasiliyVelikyy/hotel-reservation/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/VasiliyVelikyy/hotel-reservation/actions/workflows/ci.yml)
 
 ## LICENSE
 
@@ -282,7 +281,6 @@ For more details, see the [LICENSE](LICENSE) file.
 
 
 
-<div align="center">
+<div style="text-align: center;">
   <sub>Made with ❤️ and ☕</sub>
 </div>
-
