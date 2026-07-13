@@ -203,11 +203,11 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
 
         // then
         assertThat(response.id()).isEqualTo(created.id());
-        // login не обновлялся → остался из createInput
+        // login не обновлялся, остался из createInput
         assertThat(response.login()).isEqualTo(createInput.login());
-        // email обновился → стал из updateInput
+        // email обновился, стал из updateInput
         assertThat(response.email()).isEqualTo(updateInput.email());
-        // role не обновлялась → осталась из createInput
+        // role не обновлялась, осталась из createInput
         assertThat(response.role()).isEqualTo(createInput.role());
 
         User savedUser = userRepository.findById(created.id()).orElseThrow();
@@ -235,7 +235,7 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
         );
         UserResponse created2 = userService.create(input2);
 
-        // Пытаемся обновить user2 на данные user1 → конфликт
+        // Пытаемся обновить user2 на данные user1, конфликт
         UserUpdateInput updateInput = new UserUpdateInput(
                 input1.login(),
                 input1.email(),
@@ -243,8 +243,9 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
                 null
         );
 
+        var userCreatedId2 = created2.id();
         // when & then
-        assertThatThrownBy(() -> userService.update(created2.id(), updateInput))
+        assertThatThrownBy(() -> userService.update(userCreatedId2, updateInput))
                 .isInstanceOf(EntityAlreadyExistsException.class);
     }
 

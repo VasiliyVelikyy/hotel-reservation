@@ -2,6 +2,7 @@ package ru.moskalev.hotel_reservation.integration.kafka;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ import ru.moskalev.hotel_reservation.exception.KafkaStatsException;
 @Slf4j
 public class KafkaStatsPublisher {
 
-    private final KafkaTemplate<Object, Object> kafkaTemplate;
+    private final KafkaTemplate<@NonNull Object, @NonNull Object> kafkaTemplate;
 
     @Value("${spring.kafka.topics.user}")
     private String userTopic;
@@ -38,7 +39,7 @@ public class KafkaStatsPublisher {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                     doSend(topic, event);
+                    doSend(topic, event);
                 }
             });
         } else {
@@ -51,7 +52,7 @@ public class KafkaStatsPublisher {
             kafkaTemplate.send(topic, String.valueOf(event.userId()), event);
             log.info("Event sent to topic {}: {}", topic, event.getClass().getSimpleName());
         } catch (Exception e) {
-            log.error("Failed sent to topic {}: {}, {}", topic, event.getClass().getSimpleName(),e.getMessage());
+            log.error("Failed sent to topic {}: {}, {}", topic, event.getClass().getSimpleName(), e.getMessage());
             throw new KafkaStatsException("Kafka send failed", e);
         }
     }

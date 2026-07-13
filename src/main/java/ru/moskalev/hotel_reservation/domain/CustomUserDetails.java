@@ -1,6 +1,7 @@
 package ru.moskalev.hotel_reservation.domain;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,11 +25,13 @@ public class CustomUserDetails implements UserDetails {
     }
 
 
+    @NonNull
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
+    @NonNull
     @Override
     public String getUsername() {
         return login;

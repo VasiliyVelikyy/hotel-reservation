@@ -4,7 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,7 +16,6 @@ import ru.moskalev.hotel_reservation.dto.room.RoomCreateInput;
 import ru.moskalev.hotel_reservation.dto.room.RoomFilter;
 import ru.moskalev.hotel_reservation.dto.room.RoomResponse;
 import ru.moskalev.hotel_reservation.dto.room.RoomUpdateInput;
-import ru.moskalev.hotel_reservation.enumeration.UserRole;
 import ru.moskalev.hotel_reservation.exception.EntityNotFoundException;
 import ru.moskalev.hotel_reservation.repo.BookingRepository;
 import ru.moskalev.hotel_reservation.repo.HotelRepository;
@@ -32,7 +30,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.moskalev.hotel_reservation.TestConstants.ADDRESS;
-import static ru.moskalev.hotel_reservation.service.HotelServiceIntegrationTest.buildHotel;
+import static ru.moskalev.hotel_reservation.utils.TestUtils.*;
 
 @DisplayName("RoomService")
 class RoomServiceIntegrationTest extends BaseIntegrationTest {
@@ -102,7 +100,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     void create_shouldHandleNullOptionalFields() {
         // given
         Long hotelId = hotelService.create(new HotelCreateInput(
-                "Simple Hotel", null, null, "SPB", ADDRESS, 0
+                "Simple Hotel", null, null, "SPB", ADDRESS, 1
         )).id();
 
         RoomCreateInput input = new RoomCreateInput(
@@ -144,7 +142,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     void getById_shouldReturnRoom() {
         // given
         Long hotelId = hotelService.create(new HotelCreateInput(
-                "Test Hotel", null, null, "City", ADDRESS, 0
+                "Test Hotel", null, null, "City", ADDRESS, 1
         )).id();
         Room saved = roomRepository.save(buildRoom(hotelId, "Test Room"));
 
@@ -174,7 +172,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     void getAllByHotelId_shouldReturnPageWithCorrectMetadata() {
         // given
         Long hotelId = hotelService.create(new HotelCreateInput(
-                "Hotel", null, null, "City", ADDRESS, 0
+                "Hotel", null, null, "City", ADDRESS, 1
         )).id();
         roomRepository.save(buildRoom(hotelId, "Room 1"));
         roomRepository.save(buildRoom(hotelId, "Room 2"));
@@ -183,7 +181,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 2);
 
         // when
-        Page<RoomResponse> result = roomService.getAllByHotelId(hotelId, pageable);
+        var result = roomService.getAllByHotelId(hotelId, pageable);
 
         // then
         assertThat(result.getContent()).hasSize(2);
@@ -197,7 +195,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     void getAllByHotelId_shouldApplySorting() {
         // given
         Long hotelId = hotelService.create(new HotelCreateInput(
-                "Hotel", null, null, "City", ADDRESS, 0
+                "Hotel", null, null, "City", ADDRESS, 1
         )).id();
         roomRepository.save(buildRoom(hotelId, "Z Room"));
         roomRepository.save(buildRoom(hotelId, "A Room"));
@@ -206,7 +204,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("name").ascending());
 
         // when
-        Page<RoomResponse> result = roomService.getAllByHotelId(hotelId, pageable);
+        var result = roomService.getAllByHotelId(hotelId, pageable);
 
         // then
         assertThat(result.getContent())
@@ -219,14 +217,14 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     void getAllByHotelId_shouldReturnEmptyContentWhenPageOutOfBounds() {
         // given
         Long hotelId = hotelService.create(new HotelCreateInput(
-                "Hotel", null, null, "City", ADDRESS, 0
+                "Hotel", null, null, "City", ADDRESS, 1
         )).id();
         roomRepository.save(buildRoom(hotelId, "Room 1"));
 
         Pageable pageable = PageRequest.of(5, 10);
 
         // when
-        Page<RoomResponse> result = roomService.getAllByHotelId(hotelId, pageable);
+        var result = roomService.getAllByHotelId(hotelId, pageable);
 
         // then
         assertThat(result.getContent()).isEmpty();
@@ -239,7 +237,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     void getAllByHotelId_shouldReturnSecondPage() {
         // given
         Long hotelId = hotelService.create(new HotelCreateInput(
-                "Hotel", null, null, "City", ADDRESS, 0
+                "Hotel", null, null, "City", ADDRESS, 1
         )).id();
         roomRepository.save(buildRoom(hotelId, "Room A"));
         roomRepository.save(buildRoom(hotelId, "Room B"));
@@ -249,7 +247,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(1, 2);
 
         // when
-        Page<RoomResponse> result = roomService.getAllByHotelId(hotelId, pageable);
+        var result = roomService.getAllByHotelId(hotelId, pageable);
 
         // then
         assertThat(result.getContent()).hasSize(2);
@@ -275,7 +273,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     void update_shouldUpdateProvidedFields() {
         // given
         Long hotelId = hotelService.create(new HotelCreateInput(
-                "Hotel", null, null, "City", ADDRESS, 0
+                "Hotel", null, null, "City", ADDRESS, 1
         )).id();
         Room saved = roomRepository.save(buildRoom(hotelId, "Old Name"));
 
@@ -306,7 +304,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     void update_shouldNotOverwriteWithNull() {
         // given
         Long hotelId = hotelService.create(new HotelCreateInput(
-                "Hotel", null, null, "City", ADDRESS, 0
+                "Hotel", null, null, "City", ADDRESS, 1
         )).id();
         Room saved = buildRoom(hotelId, "Original");
         saved.setDescription("Original Description");
@@ -342,7 +340,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     void delete_shouldRemoveExistingRoom() {
         // given
         Long hotelId = hotelService.create(new HotelCreateInput(
-                "Hotel", null, null, "City", ADDRESS, 0
+                "Hotel", null, null, "City", ADDRESS, 1
         )).id();
         Room saved = roomRepository.save(buildRoom(hotelId, "To Delete"));
         Long id = saved.getId();
@@ -381,7 +379,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<RoomResponse> result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
+        var result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(2);
@@ -401,11 +399,11 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<RoomResponse> result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
+        var result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).name()).isEqualTo("Medium");
+        assertThat(result.getContent().getFirst().name()).isEqualTo("Medium");
     }
 
     @Test
@@ -421,11 +419,11 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<RoomResponse> result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
+        var result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).name()).isEqualTo("Big");
+        assertThat(result.getContent().getFirst().name()).isEqualTo("Big");
     }
 
     @Test
@@ -453,11 +451,11 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<RoomResponse> result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
+        var result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).name()).isEqualTo("Room 2");
+        assertThat(result.getContent().getFirst().name()).isEqualTo("Room 2");
     }
 
     @Test
@@ -475,12 +473,11 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<RoomResponse> result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
+        var result = roomService.getAllByHotelIdAndFilter(hotel.getId(), filter, pageable);
 
-        // then
-        assertThat(result.getTotalElements()).isEqualTo(1); // фильтр по датам не сработал
+        // then фильтр по датам не сработал
+        assertThat(result.getTotalElements()).isEqualTo(1);
     }
-
 
     private Room buildRoom(Long hotelId, String name) {
         Room room = getRoom(name);
@@ -491,17 +488,7 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         return room;
     }
 
-    public static Room getRoom(String name) {
-        Room room = new Room();
-        room.setName(name);
-        room.setDescription("Description");
-        room.setNumber((short) 100);
-        room.setPrice(new BigDecimal("1000.00"));
-        room.setMaxCount((byte) 2);
-        return room;
-    }
-
-    private Room buildRoom(String name, Hotel hotel, short number, BigDecimal price, byte maxCount) {
+    public static Room buildRoom(String name, Hotel hotel, short number, BigDecimal price, byte maxCount) {
         Room room = new Room();
         room.setName(name);
         room.setDescription("Description for " + name);
@@ -510,18 +497,5 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
         room.setMaxCount(maxCount);
         room.setHotel(hotel);
         return room;
-    }
-
-    public static User buildUser(String login, String email, String hashPassword, UserRole role) {
-        User user = new User();
-        user.setLogin(login);
-        user.setEmail(email);
-        user.setHashPassword(hashPassword);
-        user.setRole(role);
-        return user;
-    }
-
-    public static User buildUser(String login) {
-        return buildUser(login, login + "@test.com", "hashedPassword123", UserRole.CLIENT);
     }
 }

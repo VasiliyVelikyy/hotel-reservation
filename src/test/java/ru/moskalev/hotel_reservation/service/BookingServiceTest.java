@@ -6,14 +6,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ru.moskalev.hotel_reservation.domain.Booking;
-import ru.moskalev.hotel_reservation.domain.CustomUserDetails;
 import ru.moskalev.hotel_reservation.dto.booking.BookingCreateRequest;
 import ru.moskalev.hotel_reservation.dto.booking.BookingResponse;
-import ru.moskalev.hotel_reservation.dto.hotel.HotelCreateInput;
 import ru.moskalev.hotel_reservation.dto.room.RoomCreateInput;
 import ru.moskalev.hotel_reservation.dto.room.RoomResponse;
 import ru.moskalev.hotel_reservation.dto.user.UserCreateInput;
@@ -28,11 +24,12 @@ import ru.moskalev.hotel_reservation.repo.UserRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.moskalev.hotel_reservation.utils.TestUtils.getHotelCreateInput;
+import static ru.moskalev.hotel_reservation.utils.TestUtils.setAuthentication;
 
 @DisplayName("BookingService")
 class BookingServiceTest extends BaseIntegrationTest {
@@ -66,9 +63,7 @@ class BookingServiceTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Long testHotelId = hotelService.create(new HotelCreateInput(
-                "Test Hotel", "Description", "Title", "Москва", "Ул Тестовая", 1000
-        )).id();
+        Long testHotelId = hotelService.create(getHotelCreateInput()).id();
 
         RoomResponse room = roomService.create(testHotelId, new RoomCreateInput(
                 "Test Room",
@@ -330,8 +325,9 @@ class BookingServiceTest extends BaseIntegrationTest {
         // переключаемся обратно на testUser
         setAuthentication(testUserId, "testuser");
 
+        var bookingId = otherBooking.id();
         // when & then - пытаемся отменить чужую бронь
-        assertThatThrownBy(() -> bookingService.cancel(otherBooking.id()))
+        assertThatThrownBy(() -> bookingService.cancel(bookingId))
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessageContaining("only cancel your own");
     }
@@ -360,26 +356,5 @@ class BookingServiceTest extends BaseIntegrationTest {
         Booking booking = bookingRepository.findById(response.id()).orElseThrow();
         assertThat(booking.getStartDate()).isGreaterThan(0);
         assertThat(booking.getEndDate()).isGreaterThan(booking.getStartDate());
-    }
-
-    /**
-     * Вспомогательный метод для установки аутентификации в тестах
-     */
-    public static void setAuthentication(Long userId, String username) {
-        CustomUserDetails userDetails = new CustomUserDetails(
-                userId,
-                username,
-                "password",
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-        );
-
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

@@ -1,6 +1,7 @@
 package ru.moskalev.hotel_reservation.service;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -39,26 +40,27 @@ public class RoomService {
     }
 
     @Transactional(readOnly = true)
-    public Page<RoomResponse> getAllByHotelId(Long hotelId, Pageable pageable) {
+    public Page<@NonNull RoomResponse> getAllByHotelId(Long hotelId, Pageable pageable) {
         hotelService.checkExistHotel(hotelId);
-        Page<Room> roomPage = repository.findByHotelId(hotelId, pageable);
+        var roomPage = repository.findByHotelId(hotelId, pageable);
         return roomPage.map(mapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public Page<RoomResponse> getAllByHotelIdAndFilter(Long hotelId, RoomFilter filter, Pageable pageable) {
+    public Page<@NonNull RoomResponse> getAllByHotelIdAndFilter(Long hotelId, RoomFilter filter, Pageable pageable) {
         hotelService.checkExistHotel(hotelId);
 
-        Specification<Room> spec = RoomSpecification.withFilter(filter);
+        var spec = RoomSpecification.withFilter(filter);
 
-        Specification<Room> hotelSpec = (root, query, cb) ->
+        Specification<@NonNull Room> hotelSpec = (root, query, cb) ->
                 cb.equal(root.get("hotelId"), hotelId);
 
-        Specification<Room> combinedSpec = spec.and(hotelSpec);
+        var combinedSpec = spec.and(hotelSpec);
 
-        Page<Room> roomPage = repository.findAll(combinedSpec, pageable);
+        var roomPage = repository.findAll(combinedSpec, pageable);
         return roomPage.map(mapper::toResponse);
     }
+
     @Transactional
     public RoomResponse update(Long roomId, RoomUpdateInput input) {
         Room room = getRoom(roomId);
@@ -80,7 +82,7 @@ public class RoomService {
     }
 
     public Room findByIdForUpdate(Long roomId) {
-       return repository.findByIdForUpdate(roomId)
+        return repository.findByIdForUpdate(roomId)
                 .orElseThrow(() -> new EntityNotFoundException(ROOM_NOT_FOUND_TEMPLATE.formatted(roomId)));
     }
 }

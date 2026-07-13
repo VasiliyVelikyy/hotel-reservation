@@ -24,7 +24,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http.authorizeHttpRequests(auth -> auth
-                        //сваггер
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui",

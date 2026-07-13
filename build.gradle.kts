@@ -17,41 +17,49 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+    set("mapstructVersion", "1.6.3")
+    set("springdocVersion", "2.8.5")
+    set("bouncyCastleVersion", "1.78.1")
+    set("opencsvVersion", "5.7.1")
+    set("jspecifyVersion", "1.0.0")
+    set("testcontainersVersion", "1.20.4")
+}
+
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.mapstruct:mapstruct:1.6.3")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-liquibase")
-    implementation("org.postgresql:postgresql")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
-    implementation ("org.springframework.boot:spring-boot-starter-security")
-    implementation ("org.bouncycastle:bcprov-jdk18on:1.78.1")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-kafka")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-    implementation("com.opencsv:opencsv:5.7.1")
 
-	compileOnly("org.projectlombok:lombok")
+    implementation("org.mapstruct:mapstruct:${property("mapstructVersion")}")
+    implementation("org.postgresql:postgresql")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${property("springdocVersion")}")
+    implementation("org.bouncycastle:bcprov-jdk18on:${property("bouncyCastleVersion")}")
+    implementation("com.opencsv:opencsv:${property("opencsvVersion")}")
+    implementation("org.jspecify:jspecify:${property("jspecifyVersion")}")
 
-	annotationProcessor("org.projectlombok:lombok")
-	annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstructVersion")}")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation ("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:testcontainers:1.20.4")
-    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
-    testImplementation("org.testcontainers:postgresql:1.20.4")
-    testImplementation("org.testcontainers:kafka:1.20.4")
-    testImplementation("org.testcontainers:mongodb:1.20.4")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:testcontainers:${property("testcontainersVersion")}")
+    testImplementation("org.testcontainers:junit-jupiter:${property("testcontainersVersion")}")
+    testImplementation("org.testcontainers:postgresql:${property("testcontainersVersion")}")
+    testImplementation("org.testcontainers:kafka:${property("testcontainersVersion")}")
+    testImplementation("org.testcontainers:mongodb:${property("testcontainersVersion")}")
     testImplementation("org.springframework.security:spring-security-test")
 
-
-	testCompileOnly("org.projectlombok:lombok")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
-	testAnnotationProcessor("org.projectlombok:lombok")
+    testCompileOnly("org.projectlombok:lombok")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testAnnotationProcessor("org.projectlombok:lombok")
 }
 
 tasks.withType<Test> {

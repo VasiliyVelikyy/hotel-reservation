@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +21,6 @@ import ru.moskalev.hotel_reservation.service.HotelService;
 
 import static ru.moskalev.hotel_reservation.Constants.*;
 import static ru.moskalev.hotel_reservation.utils.CommonUtil.getSort;
-
-//todo http file, logging,readme, test util getRoom, csv test
 
 @RestController
 @AllArgsConstructor
@@ -44,10 +43,11 @@ public class HotelController implements HotelApi {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public Page<HotelResponse> getAll(@RequestParam(defaultValue = DEFAULT_PAGE) int page,
-                                      @RequestParam(defaultValue = DEFAULT_SIZE) int size,
-                                      @RequestParam(defaultValue = DEFAULT_SORTED_BY_ID) String sortBy,
-                                      @RequestParam(defaultValue = DEFAULT_DIRECTION_ASC) String direction) {
+
+    public Page<@NonNull HotelResponse> getAll(@RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                                               @RequestParam(defaultValue = DEFAULT_SIZE) int size,
+                                               @RequestParam(defaultValue = DEFAULT_SORTED_BY_ID) String sortBy,
+                                               @RequestParam(defaultValue = DEFAULT_DIRECTION_ASC) String direction) {
         var sort = getSort(sortBy, direction);
         Pageable pageable = PageRequest.of(page, size, sort);
         return hotelService.getAll(pageable);
@@ -55,7 +55,7 @@ public class HotelController implements HotelApi {
 
     @PostMapping(FILTER)
     @PreAuthorize("isAuthenticated()")
-    public Page<HotelResponse> getAllByFilter(@RequestParam(defaultValue = DEFAULT_PAGE) int page,
+    public Page<@NonNull HotelResponse> getAllByFilter(@RequestParam(defaultValue = DEFAULT_PAGE) int page,
                                               @RequestParam(defaultValue = DEFAULT_SIZE) int size,
                                               @RequestParam(defaultValue = DEFAULT_SORTED_BY_ID) String sortBy,
                                               @RequestParam(defaultValue = DEFAULT_DIRECTION_ASC) String direction,
