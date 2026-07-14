@@ -73,9 +73,9 @@ graph TB
     classDef db fill: #e8f5e9, stroke: #1b5e20, stroke-width: 2px
     classDef broker fill: #fce4ec, stroke: #880e4f, stroke-width: 2px
     class POSTMAN client
-    class CONTROLLER, SERVICE, PRODUCER, CONSUMER, SECURITY app
-    class PG, MONGO db
-    class KAFKA broker
+class CONTROLLER, SERVICE, PRODUCER, CONSUMER, SECURITY app
+class PG,MONGO db
+class KAFKA broker
 ```
 
 ## TECHNOLOGY
@@ -252,13 +252,32 @@ http/
 | `sortBy`    | `id`         | Поле для сортировки          |
 | `direction` | `ASC`        | Направление (`ASC` / `DESC`) |
 
-## STATUS DEBUG
+## CI
 
 [![CI Pipeline](https://github.com/VasiliyVelikyy/hotel-reservation/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/VasiliyVelikyy/hotel-reservation/actions/workflows/ci.yml)
 
 ## TEST COVERAGE
 
-[![Coverage](https://codecov.io/gh/VasiliyVeliky/hotel-reservation/branch/master/graph/badge.svg)](https://codecov.io/gh/VasiliyVeliky/hotel-reservation)
+[![Coverage](https://codecov.io/gh/VasiliyVelikyy/hotel-reservation/branch/master/graph/badge.svg?token=c0d69fc9-158d-479d-87fd-6e41da956019)](https://codecov.io/gh/VasiliyVelikyy/hotel-reservation)
+
+### Запуск тестов с покрытием
+
+```bash
+./gradlew test jacocoTestReport
+````
+
+Этот проект использует **JaCoCo** для измерения покрытия тестами.
+Подробный отчет доступен на [Codecov Dashboard](https://app.codecov.io/github/VasiliyVelikyy/hotel-reservation).
+
+## Testing
+
+Мы используем Codecov для отслеживания покрытия кода тестами.
+При создании Pull Request автоматически проверяется покрытие и оставляется комментарий с деталями.
+
+**Требования к покрытию:**
+
+- Минимальное покрытие: 80%
+- Покрытие не должно уменьшаться более чем на 5%
 
 ## LICENSE
 
