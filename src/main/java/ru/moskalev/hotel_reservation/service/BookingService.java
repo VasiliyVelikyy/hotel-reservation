@@ -73,7 +73,7 @@ public class BookingService {
         Booking booking = getBooking(request, user, room, reqStart, reqEnd);
         Booking savedBooking = bookingRepository.save(booking);
 
-        kafkaStatsPublisher.publishBookingEvent(new RoomBookedEvent(
+        kafkaStatsPublisher.publishBookingEventAfterCommit(new RoomBookedEvent(
                 getCurrentUserId(),
                 toLocalDate(booking.getStartDate()),
                 toLocalDate(booking.getEndDate())));

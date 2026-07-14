@@ -10,8 +10,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.function.Consumer;
 
-import static ru.moskalev.hotel_reservation.Constants.DEFAULT_DIRECTION_ASC;
-import static ru.moskalev.hotel_reservation.Constants.DIRECTION_DESC;
+import static ru.moskalev.hotel_reservation.domain.Constants.DEFAULT_DIRECTION_ASC;
+import static ru.moskalev.hotel_reservation.domain.Constants.DIRECTION_DESC;
 import static ru.moskalev.hotel_reservation.exception.ErrorMessagesTemplates.NOT_VALID_SORTED_TEMPLATE;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

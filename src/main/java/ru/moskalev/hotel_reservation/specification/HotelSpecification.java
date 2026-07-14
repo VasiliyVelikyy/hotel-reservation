@@ -14,6 +14,11 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HotelSpecification {
 
+    public static final String CITY_FIELD = "city";
+    public static final String NAME_FIELD = "name";
+    public static final String DISTANCE_FIELD = "distance";
+    public static final String RATING_FIELD = "rating";
+
     public static Specification<@NonNull Hotel> withFilter(HotelFilter filter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -23,25 +28,25 @@ public class HotelSpecification {
             }
 
             if (filter.city() != null && !filter.city().isBlank()) {
-                predicates.add(cb.equal(root.get("city"), filter.city()));
+                predicates.add(cb.equal(root.get(CITY_FIELD), filter.city()));
             }
 
             if (filter.nameContains() != null && !filter.nameContains().isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("name")),
+                predicates.add(cb.like(cb.lower(root.get(NAME_FIELD)),
                         "%" + filter.nameContains().toLowerCase() + "%"));
             }
 
             if (filter.minDistance() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("distance"), filter.minDistance()));
+                predicates.add(cb.greaterThanOrEqualTo(root.get(DISTANCE_FIELD), filter.minDistance()));
             }
 
             if (filter.maxDistance() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("distance"), filter.maxDistance()));
+                predicates.add(cb.lessThanOrEqualTo(root.get(DISTANCE_FIELD), filter.maxDistance()));
             }
 
             if (filter.minRating() != null) {
                 predicates.add(cb.greaterThanOrEqualTo(
-                        root.get("rating"),
+                        root.get(RATING_FIELD),
                         filter.minRating()
                 ));
             }

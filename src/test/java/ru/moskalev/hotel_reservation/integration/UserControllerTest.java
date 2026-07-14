@@ -22,8 +22,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.moskalev.hotel_reservation.Constants.USER;
-import static ru.moskalev.hotel_reservation.Constants.V1;
+import static ru.moskalev.hotel_reservation.domain.Constants.USER;
+import static ru.moskalev.hotel_reservation.domain.Constants.V1;
 
 @WebMvcTest(UserController.class)
 class UserControllerTest {

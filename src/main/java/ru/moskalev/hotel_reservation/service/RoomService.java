@@ -70,9 +70,6 @@ public class RoomService {
 
     @Transactional
     public void delete(Long roomId) {
-        if (!repository.existsById(roomId)) {
-            throw new EntityNotFoundException(ROOM_NOT_FOUND_TEMPLATE.formatted(roomId));
-        }
         repository.deleteById(roomId);
     }
 

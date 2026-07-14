@@ -11,7 +11,7 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static ru.moskalev.hotel_reservation.Constants.*;
+import static ru.moskalev.hotel_reservation.domain.Constants.*;
 
 @Configuration
 public class SecurityConfig {

@@ -55,7 +55,7 @@ public class UserService {
         var userWithPass = hashedPassUser(mapper.toEntity(input), input.password());
         var savedUser = repository.save(userWithPass);
 
-        kafkaStatsPublisher.publishUserEvent(new UserRegisteredEvent(savedUser.getId()));
+        kafkaStatsPublisher.publishUserEventAfterCommit(new UserRegisteredEvent(savedUser.getId()));
         return mapper.toResponse(savedUser);
     }
 

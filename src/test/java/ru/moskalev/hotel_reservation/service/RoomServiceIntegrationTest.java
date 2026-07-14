@@ -354,19 +354,6 @@ class RoomServiceIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("delete: должен выбросить исключение при удалении несуществующего номера")
-    void delete_shouldThrowWhenNotFound() {
-        // given
-        Long nonExistentId = 99999L;
-        assertThat(roomRepository.existsById(nonExistentId)).isFalse();
-
-        // when & then
-        assertThatThrownBy(() -> roomService.delete(nonExistentId))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining(nonExistentId.toString());
-    }
-
-    @Test
     @DisplayName("должен вернуть все комнаты отеля при пустом фильтре")
     void getAllByHotelId_shouldReturnAllRooms_whenFilterIsEmpty() {
         // given

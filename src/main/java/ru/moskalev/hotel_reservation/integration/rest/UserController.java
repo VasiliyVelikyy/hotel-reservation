@@ -9,7 +9,7 @@ import ru.moskalev.hotel_reservation.dto.user.UserUpdateInput;
 import ru.moskalev.hotel_reservation.integration.api.UserApi;
 import ru.moskalev.hotel_reservation.service.UserService;
 
-import static ru.moskalev.hotel_reservation.Constants.*;
+import static ru.moskalev.hotel_reservation.domain.Constants.*;
 
 @RestController
 @AllArgsConstructor

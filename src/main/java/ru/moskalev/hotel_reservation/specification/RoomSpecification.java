@@ -12,6 +12,8 @@ import ru.moskalev.hotel_reservation.dto.room.RoomFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.moskalev.hotel_reservation.specification.HotelSpecification.NAME_FIELD;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RoomSpecification {
 
@@ -44,7 +46,7 @@ public class RoomSpecification {
                                          CriteriaBuilder cb, List<Predicate> predicates) {
         if (isNotBlank(filter.nameContains())) {
             predicates.add(cb.like(
-                    cb.lower(root.get("name")),
+                    cb.lower(root.get(NAME_FIELD)),
                     "%" + filter.nameContains().toLowerCase() + "%"
             ));
         }

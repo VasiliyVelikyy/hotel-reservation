@@ -19,6 +19,12 @@ spring:
       user: user-registration
       booking: room-booking
 
+  outbox:
+    polling:
+      delay:
+        ms: 5000
+      batch-size: 100
+
   application:
     name: hotel-reservation
 

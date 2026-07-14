@@ -1,4 +1,4 @@
-package ru.moskalev.hotel_reservation;
+package ru.moskalev.hotel_reservation.domain;
 
 public class Constants {
     public static final String V1 = "/v1";
@@ -14,7 +14,6 @@ public class Constants {
     public static final String BOOKING_ID = "/{bookingId}";
     public static final String LOGIN = "/login";
     public static final String LOGIN_PATH = "/{login}";
-    public static final String OTHER_PATH = "/**";
     public static final String STATS = "/stats";
     public static final String EXPORT_CSV ="/export-csv";
 

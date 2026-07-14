@@ -12,6 +12,7 @@ import ru.moskalev.hotel_reservation.dto.kafka.BaseUserEvent;
 import ru.moskalev.hotel_reservation.dto.kafka.RoomBookedEvent;
 import ru.moskalev.hotel_reservation.dto.kafka.UserRegisteredEvent;
 import ru.moskalev.hotel_reservation.exception.KafkaStatsException;
+import ru.moskalev.hotel_reservation.service.outbox.EventOutboxService;
 
 @Component
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ import ru.moskalev.hotel_reservation.exception.KafkaStatsException;
 public class KafkaStatsPublisher {
 
     private final KafkaTemplate<@NonNull Object, @NonNull Object> kafkaTemplate;
+    private final EventOutboxService eventOutboxService;
 
     @Value("${spring.kafka.topics.user}")
     private String userTopic;
@@ -26,12 +28,20 @@ public class KafkaStatsPublisher {
     @Value("${spring.kafka.topics.booking}")
     private String bookingTopic;
 
-    public void publishUserEvent(UserRegisteredEvent userEvent) {
+    public void publishUserEventAfterCommit(UserRegisteredEvent userEvent) {
         sendAfterCommit(userTopic, userEvent);
     }
 
-    public void publishBookingEvent(RoomBookedEvent roomBookedEvent) {
+    public void publishUserEvent(UserRegisteredEvent userEvent) {
+        doSend(userTopic, userEvent);
+    }
+
+    public void publishBookingEventAfterCommit(RoomBookedEvent roomBookedEvent) {
         sendAfterCommit(bookingTopic, roomBookedEvent);
+    }
+
+    public void publishBookingEvent(RoomBookedEvent roomBookedEvent) {
+        doSend(bookingTopic, roomBookedEvent);
     }
 
     private void sendAfterCommit(String topic, BaseUserEvent event) {
@@ -53,6 +63,7 @@ public class KafkaStatsPublisher {
             log.info("Event sent to topic {}: {}", topic, event.getClass().getSimpleName());
         } catch (Exception e) {
             log.error("Failed sent to topic {}: {}, {}", topic, event.getClass().getSimpleName(), e.getMessage());
+            eventOutboxService.saveToOutbox(event.getEventType(), event);
             throw new KafkaStatsException("Kafka send failed", e);
         }
     }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+
+    <changeSet id="006-1-create-outbox-events-table" author="Vmoskalev">
+        <createTable tableName="outbox_events">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_type" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payload" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="processed" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <comment>Создание таблицы outbox_events для паттерна Transactional Outbox</comment>
+    </changeSet>
+
+    <!-- Шаг 2: Частичный индекс для ускорения polling-а -->
+    <changeSet id="006-2-create-outbox-partial-index" author="Vmoskalev">
+        <sql>
+            CREATE INDEX idx_outbox_events_unprocessed
+                ON outbox_events (created_at ASC) WHERE processed = false;
+        </sql>
+        <comment>Частичный индекс для ускорения поиска необработанных событий (processed = false)</comment>
+    </changeSet>
+
+</databaseChangeLog>

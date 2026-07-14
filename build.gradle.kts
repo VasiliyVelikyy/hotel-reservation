@@ -2,6 +2,7 @@ plugins {
 	java
 	id("org.springframework.boot") version "4.1.0"
 	id("io.spring.dependency-management") version "1.1.7"
+    id ("jacoco")
 }
 
 group = "ru.moskalev"
@@ -61,6 +62,68 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
 }
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/*HotelReservationApplication.class",
+                    "**/config/**",
+                    "**/dto/**",
+                    "**/exception/**",
+                    "**/enumeration/**",
+                    "**/domain/**",
+                    "**/integration/api/**",
+                    "**/repo/**",
+                    "**/specification/**",
+                    "**/interceptor/**",
+
+                )
+            }
+        })
+    )
+    doLast {
+        val reportFile = reports.html.outputLocation.get().file("index.html").asFile
+
+        if (reportFile.exists()) {
+            val reportUrl = "file:///" + reportFile.absolutePath.replace("\\", "/")
+            println("  Откройте отчет в браузере: $reportUrl")
+        }
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.80.toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
 
 tasks.withType<Test> {
 	useJUnitPlatform()
