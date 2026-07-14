@@ -21,6 +21,12 @@ spring:
   liquibase:
     enabled: true
 
+  outbox:
+    polling:
+      delay:
+        ms: 5000
+      batch-size: 100
+
   jpa:
     show-sql: false
     properties:

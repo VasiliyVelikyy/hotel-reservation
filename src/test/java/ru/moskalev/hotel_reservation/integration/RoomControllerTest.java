@@ -1,6 +1,7 @@
 package ru.moskalev.hotel_reservation.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.moskalev.hotel_reservation.Constants.*;
+import static ru.moskalev.hotel_reservation.domain.Constants.*;
 
 @WebMvcTest(RoomController.class)
 class RoomControllerTest {
@@ -201,7 +202,7 @@ class RoomControllerTest {
                         (byte) 1,
                         HOTEL_ID_VALUE)
         );
-        Page<RoomResponse> page = new PageImpl<>(content);
+        Page<@NonNull RoomResponse> page = new PageImpl<>(content);
 
         when(roomService.getAllByHotelId(eq(HOTEL_ID_VALUE), any(Pageable.class))).thenReturn(page);
 
@@ -221,7 +222,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("GET /{hotelId} — 200 — список пустой")
     void getAllByHotelId_empty() throws Exception {
-        Page<RoomResponse> emptyPage = Page.empty();
+        Page<@NonNull RoomResponse> emptyPage = Page.empty();
         when(roomService.getAllByHotelId(eq(HOTEL_ID_VALUE), any(Pageable.class))).thenReturn(emptyPage);
 
         mockMvc.perform(get(BASE_URL + HOTEL + PATH + HOTEL_ID_VALUE))
@@ -395,7 +396,7 @@ class RoomControllerTest {
                 HOTEL_ID_VALUE
         );
 
-        Page<RoomResponse> page = new PageImpl<>(
+        Page<@NonNull RoomResponse> page = new PageImpl<>(
                 List.of(room1),
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id")),
                 1
@@ -437,7 +438,7 @@ class RoomControllerTest {
                 HOTEL_ID_VALUE
         );
 
-        Page<RoomResponse> page = new PageImpl<>(
+        Page<@NonNull RoomResponse> page = new PageImpl<>(
                 List.of(room1),
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id")),
                 1
@@ -481,7 +482,7 @@ class RoomControllerTest {
                 HOTEL_ID_VALUE
         );
 
-        Page<RoomResponse> page = new PageImpl<>(
+        var page = new PageImpl<>(
                 List.of(room1),
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id")),
                 1
@@ -523,7 +524,7 @@ class RoomControllerTest {
                 HOTEL_ID_VALUE
         );
 
-        Page<RoomResponse> page = new PageImpl<>(
+        var page = new PageImpl<>(
                 List.of(room1),
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id")),
                 1
@@ -665,7 +666,7 @@ class RoomControllerTest {
                 null
         );
 
-        Page<RoomResponse> emptyPage = new PageImpl<>(
+        Page<@NonNull RoomResponse> emptyPage = new PageImpl<>(
                 Collections.emptyList(),
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id")),
                 0
@@ -700,7 +701,7 @@ class RoomControllerTest {
                 HOTEL_ID_VALUE
         );
 
-        Page<RoomResponse> page = new PageImpl<>(
+        var page = new PageImpl<>(
                 List.of(room1),
                 PageRequest.of(1, 5, Sort.by(Sort.Direction.DESC, "price")),
                 15

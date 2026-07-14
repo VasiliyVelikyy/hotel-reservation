@@ -2,6 +2,7 @@ package ru.moskalev.hotel_reservation.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.moskalev.hotel_reservation.Constants.BOOKING;
-import static ru.moskalev.hotel_reservation.Constants.V1;
+import static ru.moskalev.hotel_reservation.domain.Constants.BOOKING;
+import static ru.moskalev.hotel_reservation.domain.Constants.V1;
 
 @WebMvcTest(BookingController.class)
 class BookingControllerTest {
@@ -208,7 +209,7 @@ class BookingControllerTest {
         BookingResponse booking1 = new BookingResponse(1L, LocalDate.of(2026, 7, 10), LocalDate.of(2026, 7, 15), 2, 5L, 100L);
         BookingResponse booking2 = new BookingResponse(2L, LocalDate.of(2026, 8, 1), LocalDate.of(2026, 8, 5), 1, 3L, 200L);
 
-        Page<BookingResponse> page = new PageImpl<>(
+        var page = new PageImpl<>(
                 List.of(booking1, booking2),
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id")),
                 2
@@ -232,7 +233,7 @@ class BookingControllerTest {
     @Test
     @DisplayName("GET /booking — 200 — пагинация с кастомными параметрами")
     void getAllBookings_customPagination() throws Exception {
-        Page<BookingResponse> page = new PageImpl<>(
+        Page<@NonNull BookingResponse> page = new PageImpl<>(
                 Collections.emptyList(),
                 PageRequest.of(1, 5, Sort.by(Sort.Direction.DESC, "startDate")),
                 0

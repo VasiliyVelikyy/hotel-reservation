@@ -1,4 +1,4 @@
-#  Hotel Reservation Service
+# Hotel Reservation Service
 
 [![Java](https://img.shields.io/badge/Java-21+-orange?logo=openjdk)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.x-brightgreen?logo=spring)](https://spring.io/projects/spring-boot)
@@ -7,27 +7,30 @@
 [![Kafka](https://img.shields.io/badge/Apache_Kafka-3.8-black?logo=apache-kafka)](https://kafka.apache.org/)
 [![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red)](LICENSE)
 
-Сервис бронирования номеров в отелях с событийной архитектурой, аутентификацией через Base auth и аналитикой на основе Apache Kafka.
+Сервис бронирования номеров в отелях с событийной архитектурой, аутентификацией через Base auth и аналитикой на основе
+Apache Kafka.
 
 ---
 
-##  PROJECT
+## PROJECT
 
-Система позволяет пользователям регистрироваться, искать доступные номера, бронировать их на выбранные даты и получать статистику по своим действиям. Проект построен по принципам **Event-Driven Architecture**: все ключевые бизнес-события (регистрация пользователя, бронирование номера) асинхронно публикуются в Kafka и агрегируются в аналитическом хранилище MongoDB.
+Система позволяет пользователям регистрироваться, искать доступные номера, бронировать их на выбранные даты и получать
+статистику по своим действиям. Проект построен по принципам **Event-Driven Architecture**: все ключевые бизнес-события (
+регистрация пользователя, бронирование номера) асинхронно публикуются в Kafka и агрегируются в аналитическом хранилище
+MongoDB.
 
-###  Ключевые возможности
+### Ключевые возможности
 
--  **Управление пользователями** — регистрация, аутентификация, роли (`ADMIN`, `CLIENT`)
--  **Управление номерами** — CRUD операций с номерами отелей
--  **Бронирование** — проверка доступности дат, защита от овербукинга (pessimistic lock)
--  **Безопасность** — Spring Security , разграничение доступа по ролям
--  **Аналитика** — сбор событий в MongoDB с возможностью экспорта в CSV
--  **Асинхронность** — отправка событий в Kafka строго после коммита транзакции (`TransactionSynchronization.afterCommit`)
--  **API документация** — автоматическая генерация Swagger/OpenAPI
+- **Управление пользователями** — регистрация, аутентификация, роли (`ADMIN`, `CLIENT`)
+- **Управление номерами** — CRUD операций с номерами отелей
+- **Бронирование** — проверка доступности дат, защита от овербукинга (pessimistic lock)
+- **Безопасность** — Spring Security , разграничение доступа по ролям
+- **Аналитика** — сбор событий в MongoDB с возможностью экспорта в CSV
+- **Асинхронность** — отправка событий в Kafka строго после коммита транзакции (
+  `TransactionSynchronization.afterCommit`)
+- **API документация** — автоматическая генерация Swagger/OpenAPI
 
-
-##  ARCHITECTURE
-
+## ARCHITECTURE
 
 ```mermaid
 graph TB
@@ -42,7 +45,6 @@ graph TB
         PRODUCER["KafkaStatsPublisher<br/>(@Component)"]
         CONSUMER["KafkaStatsConsumer<br/>(@KafkaListener)"]
         SECURITY["Spring Security<br/>(Base auth)"]
-        
         CONTROLLER --> SERVICE
         SERVICE --> PRODUCER
         CONSUMER --> SERVICE
@@ -59,25 +61,22 @@ graph TB
         KAFKA{{"Apache Kafka<br/>Topics: user-registration,<br/>room-booking"}}
     end
 
-    %% Потоки данных
-    POSTMAN -->|"HTTP/JSON"| CONTROLLER
-    CONTROLLER -->|"JPA/SQL"| PG
-    SERVICE -->|"MongoRepository"| MONGO
-    PRODUCER -->|"KafkaTemplate.send()"| KAFKA
-    KAFKA -->|"@KafkaListener"| CONSUMER
-    
-    %% Стили
-    classDef client fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef app fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    classDef db fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
-    classDef broker fill:#fce4ec,stroke:#880e4f,stroke-width:2px
-    
+%% Потоки данных
+    POSTMAN -->|" HTTP/JSON "| CONTROLLER
+    CONTROLLER -->|" JPA/SQL "| PG
+    SERVICE -->|" MongoRepository "| MONGO
+    PRODUCER -->|" KafkaTemplate.send() "| KAFKA
+    KAFKA -->|" @KafkaListener "| CONSUMER
+%% Стили
+    classDef client fill: #e1f5fe, stroke: #01579b, stroke-width: 2px
+    classDef app fill: #fff3e0, stroke: #e65100, stroke-width: 2px
+    classDef db fill: #e8f5e9, stroke: #1b5e20, stroke-width: 2px
+    classDef broker fill: #fce4ec, stroke: #880e4f, stroke-width: 2px
     class POSTMAN client
-    class CONTROLLER,SERVICE,PRODUCER,CONSUMER,SECURITY app
-    class PG,MONGO db
+    class CONTROLLER, SERVICE, PRODUCER, CONSUMER, SECURITY app
+    class PG, MONGO db
     class KAFKA broker
 ```
-
 
 ## TECHNOLOGY
 
@@ -99,13 +98,13 @@ graph TB
 | **Сборка**           | Gradle (Kotlin DSL)                          |
 | **Контейнеризация**  | Docker, Docker Compose                       |
 
-##  FAST START
+## FAST START
 
 ### Требования
 
 - Java 21+
 - Docker & Docker Compose
--  Gradle 8+
+- Gradle 8+
 
 ### 1. Cloning repository
 
@@ -121,10 +120,10 @@ git clone https://github.com/VasiliyVelikyy/hotel-reservation.git
 ```
 
 Это поднимет:
+
 - Приложение на порту `8090`
 - PostgreSQL на порту `5432`
 - MongoDB на порту `27017`
-
 
 ### 3. Start app
 
@@ -133,20 +132,20 @@ git clone https://github.com/VasiliyVelikyy/hotel-reservation.git
 ```sql
 CREATE SCHEMA IF NOT EXISTS hotel_reservation
 ```
+
 Запуск приложения
+
 ```bash
 ./gradlew bootRun
 ```
 
 Приложение будет доступно по адресу: **http://localhost:8090**
 
-
-##  API Documentation
+## API Documentation
 
 После запуска приложения Swagger UI доступен по адресу:
 
 **http://localhost:8090/swagger-ui**
-
 
 ### HTTP-FILES
 
@@ -162,13 +161,14 @@ http/
 └── stats.http         # Получение статистики и экспорт в CSV
 ```
 
->  Для работы с защищёнными эндпоинтами сначала выполните запрос `POST /v1/user/login``.
+> Для работы с защищёнными эндпоинтами сначала выполните запрос `POST /v1/user/login``.
 
 ---
 
-##  Testing
+## Testing
 
-Проект покрыт интеграционными тестами с использованием **Testcontainers** — для каждого прогона тестов поднимаются реальные контейнеры PostgreSQL, MongoDB и Kafka.
+Проект покрыт интеграционными тестами с использованием **Testcontainers** — для каждого прогона тестов поднимаются
+реальные контейнеры PostgreSQL, MongoDB и Kafka.
 
 ### Running tests
 
@@ -178,88 +178,87 @@ http/
 
 ### Типы тестов
 
-| Тип                      | Описание                                                |
-|--------------------------|---------------------------------------------------------|
-| **Unit-тесты**           | Покрытие сервисов и мапперов (Mockito)                  |
-| **Интеграционные тесты** | Проверка связки Service → DB / Service → Kafka → Mongo  |
-| **API-тесты**            | End-to-end через `MockMvc`                              |
-
-
+| Тип                      | Описание                                               |
+|--------------------------|--------------------------------------------------------|
+| **Unit-тесты**           | Покрытие сервисов и мапперов (Mockito)                 |
+| **Интеграционные тесты** | Проверка связки Service → DB / Service → Kafka → Mongo |
+| **API-тесты**            | End-to-end через `MockMvc`                             |
 
 ## ️ Configuration
 
 Основные переменные окружения (`application.yml`):
 
-
-##  Endpoints API
+## Endpoints API
 
 > Базовый путь: `/v1`
 
-###  Auth and users (`/user`)
+### Auth and users (`/user`)
 
-| Метод  | Путь                   | Описание                          | Доступ       |
-|--------|------------------------|-----------------------------------|--------------|
-| `POST` | `/user`                | Регистрация нового пользователя   |  Публичный |
-| `GET`  | `/user/login/{login}`  | Получить пользователя по логину   |  Публичный |
-| `GET`  | `/user/{userId}`       | Получить пользователя по ID       |  Публичный |
-| `PUT`  | `/user/{userId}`       | Обновить данные пользователя      |  Публичный |
-| `DELETE` | `/user/{userId}`       | Удалить пользователя              |  Публичный |
+| Метод    | Путь                  | Описание                        | Доступ    |
+|----------|-----------------------|---------------------------------|-----------|
+| `POST`   | `/user`               | Регистрация нового пользователя | Публичный |
+| `GET`    | `/user/login/{login}` | Получить пользователя по логину | Публичный |
+| `GET`    | `/user/{userId}`      | Получить пользователя по ID     | Публичный |
+| `PUT`    | `/user/{userId}`      | Обновить данные пользователя    | Публичный |
+| `DELETE` | `/user/{userId}`      | Удалить пользователя            | Публичный |
 
-###  Отели (`/hotel`)
+### Отели (`/hotel`)
 
-| Метод  | Путь                        | Описание                          | Доступ       |
-|--------|-----------------------------|-----------------------------------|--------------|
-| `POST`   | `/hotel`                 | Создать новый отель               |  ADMIN     |
-| `GET`    | `/hotel/{hotelId}`       | Получить отель по ID              |  Auth      |
-| `GET`    | `/hotel`                 | Список всех отелей (пагинация)    |  Auth      |
-| `POST`   | `/hotel/filter`          | Поиск отелей по фильтру           |  Auth      |
-| `PUT`    | `/hotel/{hotelId}`       | Обновить информацию об отеле      |  ADMIN     |
-| `DELETE` | `/hotel/{hotelId}`       | Удалить отель                     |  ADMIN     |
-| `POST`   | `/hotel/{hotelId}/grade` | Оценить отель (1–5)               |  Auth      |
+| Метод    | Путь                     | Описание                       | Доступ |
+|----------|--------------------------|--------------------------------|--------|
+| `POST`   | `/hotel`                 | Создать новый отель            | ADMIN  |
+| `GET`    | `/hotel/{hotelId}`       | Получить отель по ID           | Auth   |
+| `GET`    | `/hotel`                 | Список всех отелей (пагинация) | Auth   |
+| `POST`   | `/hotel/filter`          | Поиск отелей по фильтру        | Auth   |
+| `PUT`    | `/hotel/{hotelId}`       | Обновить информацию об отеле   | ADMIN  |
+| `DELETE` | `/hotel/{hotelId}`       | Удалить отель                  | ADMIN  |
+| `POST`   | `/hotel/{hotelId}/grade` | Оценить отель (1–5)            | Auth   |
 
-###  Номера (`/room`)
+### Номера (`/room`)
 
-| Метод  | Путь                              | Описание                          | Доступ       |
-|--------|-----------------------------------|-----------------------------------|--------------|
-| `POST`   | `/room/{hotelId}`              | Создать номер в отеле             |  ADMIN     |
-| `GET`    | `/room/{roomId}`               | Получить номер по ID              |  Auth      |
-| `GET`    | `/room/hotel/{hotelId}`        | Все номера отеля (пагинация)      |  Auth      |
-| `POST`   | `/room/hotel/{hotelId}/filter` | Фильтр номеров отеля              |  Auth      |
-| `PUT`    | `/room/{roomId}`               | Обновить номер                    |  ADMIN     |
-| `DELETE` | `/room/{roomId}`               | Удалить номер                     |  ADMIN     |
+| Метод    | Путь                           | Описание                     | Доступ |
+|----------|--------------------------------|------------------------------|--------|
+| `POST`   | `/room/{hotelId}`              | Создать номер в отеле        | ADMIN  |
+| `GET`    | `/room/{roomId}`               | Получить номер по ID         | Auth   |
+| `GET`    | `/room/hotel/{hotelId}`        | Все номера отеля (пагинация) | Auth   |
+| `POST`   | `/room/hotel/{hotelId}/filter` | Фильтр номеров отеля         | Auth   |
+| `PUT`    | `/room/{roomId}`               | Обновить номер               | ADMIN  |
+| `DELETE` | `/room/{roomId}`               | Удалить номер                | ADMIN  |
 
 ### Бронирования (`/booking`)
 
-| Метод    | Путь                    | Описание                              | Доступ       |
-|----------|-------------------------|---------------------------------------|--------------|
-| `POST`   | `/booking`             | Создать бронирование                  |  Auth      |
-| `GET`    | `/booking/{bookingId}` | Получить бронирование по ID           |  Auth      |
-| `GET`    | `/booking/my`          | Мои бронирования                      |  Auth      |
-| `GET`    | `/booking`             | Все бронирования (пагинация)          |  ADMIN     |
-| `DELETE` | `/booking/{bookingId}` | Отменить бронирование                 |  Auth      |
+| Метод    | Путь                   | Описание                     | Доступ |
+|----------|------------------------|------------------------------|--------|
+| `POST`   | `/booking`             | Создать бронирование         | Auth   |
+| `GET`    | `/booking/{bookingId}` | Получить бронирование по ID  | Auth   |
+| `GET`    | `/booking/my`          | Мои бронирования             | Auth   |
+| `GET`    | `/booking`             | Все бронирования (пагинация) | ADMIN  |
+| `DELETE` | `/booking/{bookingId}` | Отменить бронирование        | Auth   |
 
-###  Статистика (`/stats`)
+### Статистика (`/stats`)
 
-| Метод | Путь               | Описание                        | Доступ   |
-|-------|--------------------|---------------------------------|----------|
-| `GET` | `/stats/export/csv`| Экспорт статистики в CSV-файл   |  ADMIN |
+| Метод | Путь                | Описание                      | Доступ |
+|-------|---------------------|-------------------------------|--------|
+| `GET` | `/stats/export/csv` | Экспорт статистики в CSV-файл | ADMIN  |
 
-
-
-###  Параметры пагинации (для `GET` со списком)
+### Параметры пагинации (для `GET` со списком)
 
 Все эндпоинты с пагинацией поддерживают следующие query-параметры:
 
-| Параметр    | По умолчанию | Описание                        |
-|-------------|--------------|---------------------------------|
-| `page`      | `0`          | Номер страницы (с нуля)         |
-| `size`      | `20`         | Размер страницы                 |
-| `sortBy`    | `id`         | Поле для сортировки             |
-| `direction` | `ASC`        | Направление (`ASC` / `DESC`)    |
-
+| Параметр    | По умолчанию | Описание                     |
+|-------------|--------------|------------------------------|
+| `page`      | `0`          | Номер страницы (с нуля)      |
+| `size`      | `20`         | Размер страницы              |
+| `sortBy`    | `id`         | Поле для сортировки          |
+| `direction` | `ASC`        | Направление (`ASC` / `DESC`) |
 
 ## STATUS DEBUG
+
 [![CI Pipeline](https://github.com/VasiliyVelikyy/hotel-reservation/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/VasiliyVelikyy/hotel-reservation/actions/workflows/ci.yml)
+
+## TEST COVERAGE
+
+[![Coverage](https://codecov.io/gh/VasiliyVeliky/hotel-reservation/branch/master/graph/badge.svg)](https://codecov.io/gh/VasiliyVeliky/hotel-reservation)
 
 ## LICENSE
 
@@ -270,7 +269,8 @@ For more details, see the [LICENSE](LICENSE) file.
 
 **MOSKALEV VASILIY**
 
-##  CONTACTS
+## CONTACTS
+
 [![Email](https://img.shields.io/badge/Email-vasian_vrn%40mail.ru-EA4335?logo=gmail)](mailto:vasian_vrn@mail.ru)
 [![Telegram](https://img.shields.io/badge/Telegram-%40vasiliyVelikiyy-blue?logo=telegram)](https://t.me/vasiliyVelikiyy)
 [![HeadHunter](https://img.shields.io/badge/HeadHunter-Resume-D6001C?logo=headhunter)](https://voronezh.hh.ru/resume/dab91c46ff092418870039ed1f5769426f654a)

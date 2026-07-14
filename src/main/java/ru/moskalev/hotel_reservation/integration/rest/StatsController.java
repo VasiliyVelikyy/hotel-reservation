@@ -14,7 +14,7 @@ import ru.moskalev.hotel_reservation.service.CsvExportService;
 
 import java.time.LocalDate;
 
-import static ru.moskalev.hotel_reservation.Constants.*;
+import static ru.moskalev.hotel_reservation.domain.Constants.*;
 
 @RestController
 @RequestMapping(V1 + STATS)

@@ -16,7 +16,7 @@ import ru.moskalev.hotel_reservation.dto.room.RoomUpdateInput;
 import ru.moskalev.hotel_reservation.integration.api.RoomApi;
 import ru.moskalev.hotel_reservation.service.RoomService;
 
-import static ru.moskalev.hotel_reservation.Constants.*;
+import static ru.moskalev.hotel_reservation.domain.Constants.*;
 import static ru.moskalev.hotel_reservation.utils.CommonUtil.getSort;
 
 @RestController

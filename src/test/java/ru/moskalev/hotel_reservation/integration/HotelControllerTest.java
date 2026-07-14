@@ -1,6 +1,7 @@
 package ru.moskalev.hotel_reservation.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.moskalev.hotel_reservation.Constants.*;
+import static ru.moskalev.hotel_reservation.domain.Constants.*;
 
 @WebMvcTest(HotelController.class)
 class HotelControllerTest {
@@ -191,7 +192,7 @@ class HotelControllerTest {
                         "SPB", "Address 2", 2000, 0D, 0D, 0
                 )
         );
-        Page<HotelResponse> page = new PageImpl<>(content);
+        var page = new PageImpl<>(content);
 
         when(hotelService.getAll(any(Pageable.class))).thenReturn(page);
 
@@ -212,7 +213,7 @@ class HotelControllerTest {
     @Test
     @DisplayName("GET / — 200 — список пустой")
     void getAll_empty() throws Exception {
-        Page<HotelResponse> emptyPage = Page.empty();
+        Page<@NonNull HotelResponse> emptyPage = Page.empty();
         when(hotelService.getAll(any(Pageable.class))).thenReturn(emptyPage);
 
         mockMvc.perform(get(BASE_URL))
@@ -422,7 +423,7 @@ class HotelControllerTest {
                 1L, "Hilton", "Luxury hotel", "Best Hotel", "Moscow", "Tverskaya 1", 1500, 4.5, 100.0, 20
         );
 
-        Page<HotelResponse> page = new PageImpl<>(
+        var page = new PageImpl<>(
                 List.of(hotel1),
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id")),
                 1

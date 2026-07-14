@@ -15,7 +15,7 @@ import ru.moskalev.hotel_reservation.service.BookingService;
 
 import java.util.List;
 
-import static ru.moskalev.hotel_reservation.Constants.*;
+import static ru.moskalev.hotel_reservation.domain.Constants.*;
 import static ru.moskalev.hotel_reservation.utils.CommonUtil.getSort;
 
 @RestController
