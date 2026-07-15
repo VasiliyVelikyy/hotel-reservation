@@ -73,9 +73,9 @@ graph TB
     classDef db fill: #e8f5e9, stroke: #1b5e20, stroke-width: 2px
     classDef broker fill: #fce4ec, stroke: #880e4f, stroke-width: 2px
     class POSTMAN client
-class CONTROLLER, SERVICE, PRODUCER, CONSUMER, SECURITY app
-class PG,MONGO db
-class KAFKA broker
+    class CONTROLLER,SERVICE,PRODUCER,CONSUMER,SECURITY app
+    class PG,MONGO db
+    class KAFKA broker
 ```
 
 ## TECHNOLOGY
