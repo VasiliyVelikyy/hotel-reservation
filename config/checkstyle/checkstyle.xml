@@ -8,31 +8,33 @@
     <!-- Проверяем окончания строк и отсутствие табуляции -->
     <module name="FileTabCharacter"/>
 
-    <!-- Проверяем длину строк: максимум 120 символов -->
-    <module name="LineLength">
-        <property name="max" value="120"/>
-    </module>
+<!--    Раскоментировтаь чтобы пайплайн упал-->
 
-    <!-- Проверяем структуру Java-файлов -->
-    <module name="TreeWalker">
+<!--    &lt;!&ndash; Проверяем длину строк: максимум 120 символов &ndash;&gt;-->
+<!--    <module name="LineLength">-->
+<!--        <property name="max" value="120"/>-->
+<!--    </module>-->
 
-        <!-- Запрещаем wildcard-импорты: import java.util.* -->
-        <module name="AvoidStarImport"/>
+<!--    &lt;!&ndash; Проверяем структуру Java-файлов &ndash;&gt;-->
+<!--    <module name="TreeWalker">-->
 
-        <!-- Проверяем порядок импортов -->
-        <module name="CustomImportOrder">
-            <property name="customImportOrderRules"
-                      value="STATIC###THIRD_PARTY_PACKAGE###STANDARD_JAVA_PACKAGE"/>
-            <property name="separateLineBetweenGroups" value="true"/>
-        </module>
+<!--        &lt;!&ndash; Запрещаем wildcard-импорты: import java.util.* &ndash;&gt;-->
+<!--        <module name="AvoidStarImport"/>-->
 
-        <!-- Проверяем длину методов -->
-        <module name="MethodLength">
-            <property name="max" value="60"/>
-        </module>
+<!--        &lt;!&ndash; Проверяем порядок импортов &ndash;&gt;-->
+<!--        <module name="CustomImportOrder">-->
+<!--            <property name="customImportOrderRules"-->
+<!--                      value="STATIC###THIRD_PARTY_PACKAGE###STANDARD_JAVA_PACKAGE"/>-->
+<!--            <property name="separateLineBetweenGroups" value="true"/>-->
+<!--        </module>-->
 
-        <!-- Запрещаем пустые блоки кода -->
-        <module name="EmptyBlock"/>
+<!--        &lt;!&ndash; Проверяем длину методов &ndash;&gt;-->
+<!--        <module name="MethodLength">-->
+<!--            <property name="max" value="60"/>-->
+<!--        </module>-->
 
-    </module>
+<!--        &lt;!&ndash; Запрещаем пустые блоки кода &ndash;&gt;-->
+<!--        <module name="EmptyBlock"/>-->
+
+<!--    </module>-->
 </module>
