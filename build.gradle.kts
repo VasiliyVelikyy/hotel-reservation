@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.moskalev"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.1"
 
 java {
 	toolchain {
@@ -24,7 +24,7 @@ ext {
     set("bouncyCastleVersion", "1.78.1")
     set("opencsvVersion", "5.7.1")
     set("jspecifyVersion", "1.0.0")
-    set("testcontainersVersion", "1.20.4")
+    set("testcontainersVersion", "1.21.4")
 }
 
 dependencies {

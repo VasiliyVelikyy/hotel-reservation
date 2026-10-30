@@ -1,0 +1,67 @@
+<mxfile host="Electron">
+  <diagram name="Страница-1" id="EwFvOJe8EZAuE1d2pIeT">
+    <mxGraphModel dx="1414" dy="849" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="gj52nC97xoRqUjivaRUC-1" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="" vertex="1">
+          <mxGeometry height="150" width="150" x="90" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="gj52nC97xoRqUjivaRUC-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Обнаружение дефета. Клиент или тестер&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;сообщает о двойном бронировинии&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="260" x="35" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="gj52nC97xoRqUjivaRUC-3" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;Постановка задачи.&lt;div&gt;Команда фиксирует условия воспроизведения и ожидаемое поведение&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="150" x="450" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="gj52nC97xoRqUjivaRUC-4" edge="1" parent="1" source="gj52nC97xoRqUjivaRUC-1" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="gj52nC97xoRqUjivaRUC-3" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="550" y="330" as="sourcePoint" />
+            <mxPoint x="600" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oj8MUC7hHO5kiikz036M-1" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Изменение кода&lt;div&gt;Разработчик исправляет бизнес логику бронирования&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="150" x="790" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="oj8MUC7hHO5kiikz036M-2" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Проверка. Запуск тестов.&lt;div&gt;Включая конкруирующие запросы и пересекающиеся даты&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="150" x="810" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="oj8MUC7hHO5kiikz036M-3" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Сборка и выпус. Формируеться версия приложения, которя согласовывается по проверкам&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="150" x="430" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="oj8MUC7hHO5kiikz036M-4" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Эксплуатация. Сервис запускаеться, проверяються ошибки и доступность" vertex="1">
+          <mxGeometry height="150" width="150" x="80" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="oj8MUC7hHO5kiikz036M-6" edge="1" parent="1" source="gj52nC97xoRqUjivaRUC-3" style="endArrow=classic;html=1;rounded=0;" target="oj8MUC7hHO5kiikz036M-1" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="710" y="270" as="sourcePoint" />
+            <mxPoint x="760" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oj8MUC7hHO5kiikz036M-7" edge="1" parent="1" source="oj8MUC7hHO5kiikz036M-1" style="endArrow=classic;html=1;rounded=0;" target="oj8MUC7hHO5kiikz036M-2" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="710" y="270" as="sourcePoint" />
+            <mxPoint x="760" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oj8MUC7hHO5kiikz036M-8" edge="1" parent="1" source="oj8MUC7hHO5kiikz036M-2" style="endArrow=classic;html=1;rounded=0;entryX=0.433;entryY=0.027;entryDx=0;entryDy=0;entryPerimeter=0;" target="oj8MUC7hHO5kiikz036M-3" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="580" y="420" />
+            </Array>
+            <mxPoint x="710" y="270" as="sourcePoint" />
+            <mxPoint x="760" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oj8MUC7hHO5kiikz036M-9" edge="1" parent="1" source="oj8MUC7hHO5kiikz036M-3" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="oj8MUC7hHO5kiikz036M-4" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1160" y="450" as="sourcePoint" />
+            <mxPoint x="760" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oj8MUC7hHO5kiikz036M-10" edge="1" parent="1" source="oj8MUC7hHO5kiikz036M-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;innerLoopWaypoints=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.553;entryY=-0.013;entryDx=0;entryDy=0;entryPerimeter=0;" target="oj8MUC7hHO5kiikz036M-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

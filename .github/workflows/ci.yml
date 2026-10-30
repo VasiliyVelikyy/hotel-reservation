@@ -7,6 +7,9 @@ on:
     branches: [main, master, develop]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -20,18 +23,15 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: gradle
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build and Run Tests with JaCoCo
-        run: ./gradlew clean test jacocoTestReport
-        # Testcontainers сам поднимет Postgres, Mongo и Kafka внутри этого шага
-        env:
-          TESTCONTAINERS_RYUK_DISABLED: true
-          TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: /var/run/docker.sock
-          TESTCONTAINERS_CHECKS_DISABLE: false
+        run: ./gradlew clean build
 
       - name: Upload test results
         if: always()
@@ -39,18 +39,12 @@ jobs:
         with:
           name: test-results
           path: build/reports/tests/
+          if-no-files-found: ignore
 
       - name: Upload JaCoCo coverage report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: build/reports/jacoco/test/jacocoTestReport.xml
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./build/reports/jacoco/test/jacocoTestReport.xml
-          fail_ci_if_error: false
-          verbose: true
+          path: build/reports/jacoco/test/
+          if-no-files-found: ignore
