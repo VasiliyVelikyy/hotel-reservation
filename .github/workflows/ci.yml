@@ -30,6 +30,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Run Checkstyle
+        run: ./gradlew checkstyleMain checkstyleTest
+
       - name: Build and Run Tests with JaCoCo
         run: ./gradlew clean build
 
