@@ -47,7 +47,7 @@ jobs:
         run: ./gradlew clean build
 
       - name: Upload application JAR
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v4
         with:
           name: hotel-reservation-app
