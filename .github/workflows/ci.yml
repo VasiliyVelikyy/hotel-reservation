@@ -33,6 +33,14 @@ jobs:
       - name: Run Checkstyle
         run: ./gradlew checkstyleMain checkstyleTest
 
+      - name: Run SpotBugs
+        run: ./gradlew spotbugsMain spotbugsTest
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and Run Tests with JaCoCo
         run: ./gradlew clean build
 

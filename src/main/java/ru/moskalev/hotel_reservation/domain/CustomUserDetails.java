@@ -2,28 +2,31 @@ package ru.moskalev.hotel_reservation.domain;
 
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 @Getter
-@Setter
 public class CustomUserDetails implements UserDetails {
+
     private final Long id;
     private final String login;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(Long id, String login, String password,
-                             Collection<? extends GrantedAuthority> authorities) {
+    public CustomUserDetails(
+            Long id,
+            String login,
+            String password,
+            Collection<? extends GrantedAuthority> authorities
+    ) {
         this.id = id;
         this.login = login;
         this.password = password;
-        this.authorities = authorities;
+        this.authorities = List.copyOf(authorities);
     }
-
 
     @NonNull
     @Override
